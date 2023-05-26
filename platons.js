@@ -1,5 +1,5 @@
-﻿import * as THREE from 'three';
-import {OrbitControls} from 'three/addons/OrbitControls.js';
+﻿import * as THREE from './libs/three.module.min.js';
+import {OrbitControls} from './libs/OrbitControls.js';
 import {CubeGeometry} from './CubeGeometry.js';
 
 

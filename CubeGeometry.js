@@ -1,4 +1,4 @@
-﻿import * as THREE from 'three';
+﻿import * as THREE from './libs/three.module.min.js';
 	
 	
 class CubeGeometry extends THREE.PolyhedronGeometry
