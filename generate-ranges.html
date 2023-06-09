@@ -1,0 +1,129 @@
+﻿<!DOCTYPE html>
+
+<!--
+	This generator checks the minimal and maximal scale of the secondaty platon
+	in respect to the primary platon. The goal is to calculate the meaningful
+	range of scaling. The result is JS code that goes into file platon-ranges.js
+	
+	Algorithm: make a convex polyhedron based on the vertices of a primary and
+	a secondary platons. If the resulting vertices are only from one of the
+	platons, then the other is too small and is entorely inside it.
+-->
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	</head>
+	
+	<body>
+		<div id="gencode"></div>
+		
+		<script type="module">
+			import * as THREE from './libs/three.module.min.js';
+			import {ConvexGeometry} from './libs/ConvexGeometry.js';
+			import {CubeGeometry} from './CubeGeometry.js';
+			
+
+			var MAX_LEVEL = 5;
+			
+			var SHAPE_CLASS = [
+					THREE.TetrahedronGeometry,
+					THREE.OctahedronGeometry,
+					CubeGeometry,
+					THREE.DodecahedronGeometry,
+					THREE.IcosahedronGeometry,
+				]
+		
+			var SHAPE = [ [], [], [], [], [] ];
+
+
+			var html = document.getElementById( 'gencode' );
+			
+			function hash( x, y, z )
+			{
+				return Math.round(10000*x)+':'+Math.round(10000*y)+':'+Math.round(10000*z);
+			}
+
+
+			for( var type=0; type<5; type++ )
+			for( var level=1; level<=MAX_LEVEL; level++ )
+			{
+				var geometry = new SHAPE_CLASS[type]( 1, level-1 ),
+					vertices = [],
+					hashes = [];
+
+				var pos = geometry.getAttribute('position');
+				
+				for( var i=0; i<pos.count; i++ )
+				{
+					var x = pos.getX( i ),
+						y = pos.getY( i ),
+						z = pos.getZ( i );
+						
+					var h = hash( x, y, z );
+					if( hashes.indexOf(h) < 0 )
+					{
+						hashes.push( h );
+						vertices.push( new THREE.Vector3(x,y,z) );
+					}
+				}
+				SHAPE[type][level] = {vertices: vertices, hashes: hashes};
+			}
+			
+			function test( typeA, levelA, typeB, levelB )
+			{
+				
+//				console.log(
+//					'test', typeA, levelA, SHAPE[typeA][levelA].vertices.length,
+//					'with', typeB, levelB, SHAPE[typeB][levelB].vertices.length
+//				);
+				
+				var firstScale = 0;
+				var lastScale = 0;
+				
+				for( var i = 1; i < 10000; i++ )
+				{
+					var vertices = [...SHAPE[typeA][levelA].vertices];
+
+					for( var vector of SHAPE[typeB][levelB].vertices )
+						vertices.push( new THREE.Vector3().addScaledVector( vector, i/1000 ) );
+
+					var geom = new ConvexGeometry( vertices ),
+						pos = geom.getAttribute( 'position' );
+						
+					var inHash = 0,
+						outHash = 0;
+						
+					for( var j=0; j<pos.count; j++ )
+					{
+						var x = pos.getX( j ),
+							y = pos.getY( j ),
+							z = pos.getZ( j );
+							
+						var h = hash( x, y, z );
+						if( SHAPE[typeA][levelA].hashes.indexOf(h) < 0 )
+							outHash++;
+						else
+							inHash++;
+					}
+
+					if( outHash==0 ) firstScale = (i-1)/1000;
+					if( inHash!=0 ) lastScale = (i+1)/1000;
+					
+					//if( inHash!=0 && outHash!=0 ) console.log( 'scale ',i/1000,[inHash,outHash] );
+					geom.dispose( );
+				}
+	
+				console.log( `'${typeA}-${levelA}-${typeB}-${levelB}: [${Math.floor(1000*firstScale)}, ${Math.ceil(1000*lastScale)}],` );
+				html.innerHTML += `'${typeA}-${levelA}-${typeB}-${levelB}': [${Math.floor(1000*firstScale)}, ${Math.ceil(1000*lastScale)}],<br>`;
+			}
+
+
+
+			for( var typeA=0; typeA<5; typeA++ )
+			for( var levelA=1; levelA<=MAX_LEVEL; levelA++ )
+			for( var typeB=0; typeB<5; typeB++ )
+			for( var levelB=1; levelB<=MAX_LEVEL; levelB++ )
+				test( typeA, levelA, typeB, levelB );
+		</script>
+	</body>
+</html>

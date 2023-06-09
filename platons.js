@@ -1,6 +1,7 @@
 ﻿import * as THREE from './libs/three.module.min.js';
 import {OrbitControls} from './libs/OrbitControls.js';
 import {CubeGeometry} from './CubeGeometry.js';
+import {RANGE} from './platon-ranges.js';
 
 
 
@@ -11,8 +12,19 @@ import {CubeGeometry} from './CubeGeometry.js';
 		document.body.style.margin = 0;
 		document.body.style.overflow = 'hidden';
 
+	var wall = new THREE.TextureLoader().load( 'textures/wall.png' );
+		wall.wrapS = THREE.RepeatWrapping;
+		wall.wrapT = THREE.RepeatWrapping;
+
+	var envMap = new THREE.CubeTextureLoader().load( [
+			'textures/envMap.jpg', 'textures/envMap.jpg',
+			'textures/envMap.jpg', 'textures/envMap.jpg',
+			'textures/envMap.jpg', 'textures/envMap.jpg',
+		] );
+
 	var scene = new THREE.Scene();
-		scene.background = new THREE.Color( 'lightgray' );
+		scene.background = wall;	
+		scene.backgroundIntensity = 1;
 
 	var camera = new THREE.PerspectiveCamera( 60, 1, 10, 1000 );
 		camera.position.set( 0, 0, 250 );
@@ -21,14 +33,11 @@ import {CubeGeometry} from './CubeGeometry.js';
 	var controls = new OrbitControls( camera, renderer.domElement );
 		controls.enableDamping = true;
 
-	var light = new THREE.DirectionalLight( 'white', 1 );
+	var light = new THREE.DirectionalLight( 'white' );
 		light.target = scene;
 		scene.add( light );
 
-	var wall = new THREE.TextureLoader().load( "wall.jpg" );
-		wall.wrapS = THREE.RepeatWrapping;
-		wall.wrapT = THREE.RepeatWrapping;
-		scene.background = wall;		
+
 }
 
 
@@ -82,7 +91,9 @@ import {CubeGeometry} from './CubeGeometry.js';
 	
 	for( var type=0; type<5; type++ )
 	for( var level=1; level<=MAX_LEVEL; level++ )
+	{
 		SHAPE[type][level] = new SHAPE_CLASS[type]( 1, level-1 );
+	}
 }
 
 
@@ -90,19 +101,13 @@ import {CubeGeometry} from './CubeGeometry.js';
 // primary platon
 {
 	var primaryMaterial = new THREE.MeshStandardMaterial( {
-			color: 'Gray',
-			metalness: 1,
-			roughness: 0.5,
 			flatShading: true,
+			envMap: envMap,
 		} );
 
 	var secondaryMaterial = new THREE.MeshStandardMaterial( {
-			color: 'Orange',
-			metalness: 0,
-			roughness: 0.2,
 			flatShading: true,
-			emissive: 'Orange',
-			emissiveIntensity: 0.2,
+			envMap: envMap,
 		} )
 		
 	var primary = new THREE.Mesh( SHAPE[0][3], primaryMaterial );	
@@ -117,12 +122,30 @@ import {CubeGeometry} from './CubeGeometry.js';
 
 
 // update platons
-function updatePlatons( primaryOptions, secondaryOptions )
+function updatePlatons( primaryOptions, secondaryOptions, environmentOptions )
 {
 	primary.geometry = SHAPE[primaryOptions.type][primaryOptions.level];
+	primary.material.color.set( primaryOptions.color );
+	primary.material.metalness = THREE.MathUtils.mapLinear( primaryOptions.gloss, -10, 10, 0, 1 );
+	primary.material.roughness = 1-primary.material.metalness;
 	
 	secondary.geometry = SHAPE[secondaryOptions.type][secondaryOptions.level];
-	secondary.scale.set( 1+secondaryOptions.scale/100, 1+secondaryOptions.scale/100, 1+secondaryOptions.scale/100 );
+	secondary.material.color.set( secondaryOptions.color );
+	secondary.material.metalness = THREE.MathUtils.mapLinear( secondaryOptions.gloss, -10, 10, 0, 1 );
+	secondary.material.roughness = 1-secondary.material.metalness;
+
+	var range = RANGE[ `${primaryOptions.type}-${primaryOptions.level}-${secondaryOptions.type}-${secondaryOptions.level}` ];
+	if( !range ) range = [1,2000];
+	
+	var scale = THREE.MathUtils.mapLinear( secondaryOptions.scale, 0, 100, range[0], range[1] ) / 1000;
+	secondary.scale.set( scale, scale, scale );
+
+	scene.backgroundIntensity = [0,0.25,1,1.2,2][environmentOptions.background+2];
+	
+	light.intensity = [0.1,0.4,0.8,1.1,1.5][environmentOptions.light+2];
+	
+	primary.material.envMapIntensity = [0.2,0.4,0.6,0.8,1][environmentOptions.light+2];
+	secondary.material.envMapIntensity = primary.material.envMapIntensity;
 }
 	
 	

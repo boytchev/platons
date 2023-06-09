@@ -9,10 +9,23 @@
 
 		
 		<style>
-			.lil-gui .controller.option em {
-				color: Yellow;
+			.lil-gui.root {
+				border-bottom-right-radius: 2em;
+				margin: 0em;
+				padding: 1em;
+				left: 0;
+				top: 0;
+				position: fixed;
+			}
+			
+			.lil-gui em {
+				color: Orange;
 				font-weight: bold;
 				font-style: normal;
+			}
+			.lil-gui big {
+				font-weight: bold;
+				text-transform: uppercase;
 			}
 			
 			#primary {
@@ -29,24 +42,21 @@
 				display: inline-block;
 			}
 			
+			right {
+				color: gray;
+				font-size: 80%;
+				float: right;
+			}
+			
+			.lil-gui .controller.string input {
+				font-family: Monospace;
+			}
+			
 		</style>
 		<script src="libs/lil-gui.umd.js"></script>
 	</head>
 	
 	<body>
-		<!--script async src="https://ga.jspm.io/npm:es-module-shims@1.5.1/dist/es-module-shims.js" crossorigin="anonymous"></script>
-		
-		<script type="importmap">
-		  {
-			"imports": {
-			  //"three": "https://unpkg.com/three@0.152.0/build/three.module.js",
-			  //"three/addons/": "https://unpkg.com/three@0.152.0/examples/jsm/"
-			  "three": "./libs/three.module.min.js",
-			  "three/addons/": "./libs/"
-			}
-		  }
-		</script-->
-
 		<div id="primary"></div>
 		<div id="secondary"></div>
 		<!--h1 class="white">Fluid effects<span id="caption"></span><a href="https://boytchev.github.io/etudes/">&larr;</a></h1-->
@@ -62,42 +72,110 @@
 					'<em>D</em>odecahedron': 3,
 					'<em>I</em>cosahedron': 4
 				}
-			
-			var PLATON_LEVELS = [];
-				for( var i=1; i<=MAX_LEVEL; i++ )
-					PLATON_LEVELS.push( i );
 					
+			var mainOptions = {
+					geometry: '',
+					material: '',
+				};
+			
 			var primaryOptions = {
-					type: 4,
-					level: 2,
+					type: 0,
+					level: 3,
+					color: 0x09135D,
+					gloss: 0,
 				};
 			
 			var secondaryOptions = {
 					type: 1,
 					level: 2,
-					scale: 2.8,
+					scale: 47,
+					color: 0xffffff,
+					gloss: 0,
 				};
-			
+
+			var environmentOptions = {
+					background: 0,
+					light: 0,
+				};
+				
 			// interactive panel for selecting fluid effects
-						
-			var guiPrimary = new lil.GUI({title:'Primary shape',container:document.getElementById('primary')});
-				guiPrimary.add( primaryOptions, 'type', PLATON_TYPES ).name( 'Type' ).onChange( onChange );
-				guiPrimary.add( primaryOptions, 'level', PLATON_LEVELS ).name( 'Level' ).onChange( onChange );
-				guiPrimary.open();
-						
-			var guiSecondary = new lil.GUI({title:'Secondary shape',container:document.getElementById('secondary')});
-				guiSecondary.add( secondaryOptions, 'type', PLATON_TYPES ).name( 'Type' ).onChange( onChange );
-				guiSecondary.add( secondaryOptions, 'level', PLATON_LEVELS ).name( 'Level' ).onChange( onChange );
-				guiSecondary.add( secondaryOptions, 'scale' ).min( -90 ).max( 90 ).step( 0.1 ).name( 'Relative scale' ).onChange( onChange );
-				guiSecondary.open();
+	
+			var gui = new lil.GUI({title:'<big>Platon</big>',container:document.getElementById('primary')}),
+				geoController = gui.add( mainOptions, 'geometry' ).name( 'Code<right>geometry</right>' ).onChange( onChangeCode ),
+				matController = gui.add( mainOptions, 'material' ).name( '<right>material</right>' ).onChange( onChangeCode );
+
+			var guiTopology = gui.addFolder( '<big>Topology</big>' );
+				guiTopology.add( primaryOptions, 'type', PLATON_TYPES ).name( 'Primary<right>type</right>' ).onChange( onChange );
+				guiTopology.add( primaryOptions, 'level' ).min( 1 ).max( MAX_LEVEL ).step( 1 ).name( '<right>level</right>' ).onChange( onChange );
+				guiTopology.add( secondaryOptions, 'type', PLATON_TYPES ).name( 'Secondary<right>type</right>' ).onChange( onChange );
+				guiTopology.add( secondaryOptions, 'level' ).min( 1 ).max( MAX_LEVEL ).step( 1 ).name( '<right>level</right>' ).onChange( onChange );
+				guiTopology.add( secondaryOptions, 'scale' ).min( 1 ).max( 100 ).step( 1 ).name( '<right>scale</right>' ).onChange( onChange );
+				
+				
+			var guiDecor = gui.addFolder( '<big>Decoration</big>' );
+				guiDecor.addColor( primaryOptions, 'color' ).name( 'Primary<right>color</right>' ).onChange( onChange );
+				guiDecor.add( primaryOptions, 'gloss' ).min( -10 ).max( 10 ).step( 1 ).name( '<right>gloss</right>' ).onChange( onChange );
+				guiDecor.addColor( secondaryOptions, 'color' ).name( 'Secondary<right>color</right>' ).onChange( onChange );
+				guiDecor.add( secondaryOptions, 'gloss' ).min( -10 ).max( 10 ).step( 1 ).name( '<right>gloss</right>' ).onChange( onChange );
+
+
+			var guiEnvironment = gui.addFolder( '<big>Environment</big>' );
+				guiEnvironment.add( environmentOptions, 'background' ).min( -2 ).max( 2 ).step( 1 ).name( 'Background' ).onChange( onChange );
+				guiEnvironment.add( environmentOptions, 'light' ).min( -2 ).max( 2 ).step( 1 ).name( 'Light' ).onChange( onChange );
 
 
 			function onChange( event )
 			{
-				updatePlatons( primaryOptions, secondaryOptions );
+				updatePlatons( primaryOptions, secondaryOptions, environmentOptions );
+				
+				
+				// TOPOLOGY 
+				
+				// primary platon
+				var geometry = 'TOCDI'[primaryOptions.type];
+				if( primaryOptions.level != 1 )
+					geometry += primaryOptions.level;
+				geometry += ':';
+				
+				// secondary platon
+				geometry += 'TOCDI'[secondaryOptions.type];
+				if( secondaryOptions.level != 1 )
+					geometry += secondaryOptions.level;
+				geometry += '+' + secondaryOptions.scale;
+				
+				mainOptions.geometry = geometry;
+				
+				// DECORATION 
+
+				var material = primaryOptions.color.toString(16);
+				if( primaryOptions.gloss < 0 )
+					material += primaryOptions.gloss;
+				else if( primaryOptions.gloss > 0 )
+					material += '+' + primaryOptions.gloss;
+				material += ':';
+
+				material += secondaryOptions.color.toString(16);
+				if( secondaryOptions.gloss < 0 )
+					material += secondaryOptions.gloss;
+				else if( secondaryOptions.gloss > 0 )
+					material += '+' + secondaryOptions.gloss;
+
+				mainOptions.material = material;
+				
+				
+				geoController.updateDisplay( );
+				matController.updateDisplay( );
+
 			}
 			
-			updatePlatons( primaryOptions, secondaryOptions );
+
+
+			function onChangeCode( event )
+			{
+			}
+			
+			updatePlatons( primaryOptions, secondaryOptions, environmentOptions );
+			onChange( );
 		</script>
 	</body>
 </html>
