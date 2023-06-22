@@ -2,6 +2,7 @@
 import {OrbitControls} from './libs/OrbitControls.js';
 import {CubeGeometry} from './CubeGeometry.js';
 import {RANGE} from './platon-ranges.js';
+import { GLTFExporter } from './libs/GLTFExporter.js';
 
 
 
@@ -149,4 +150,63 @@ function updatePlatons( primaryOptions, secondaryOptions, environmentOptions )
 }
 	
 	
-export { MAX_LEVEL, updatePlatons };
+
+function removeEnvMap( )
+{
+	primaryMaterial.envMap = undefined;
+	secondaryMaterial.envMap = undefined;
+}
+		
+
+function restoreEnvMap( )
+{
+	primaryMaterial.envMap = envMap;
+	secondaryMaterial.envMap = envMap;
+}
+
+
+var exporter = new GLTFExporter();
+var exporterLink = document.createElement('a');
+
+function exportPlatonAsGLTF( binary )
+{
+	var fileName = binary ? 'platon.glb' : 'platon.gltf';
+	
+	removeEnvMap( );
+	
+	exporter.parse(
+		primary,
+		(gltf) => {
+					var type = binary ? 'application/octet-stream' : 'text/plain;charset=utf-8',
+						data = binary ? gltf : JSON.stringify( gltf ),
+						blob = new Blob( [data], {type: type} );
+					
+					exporterLink.href = URL.createObjectURL( blob );
+					exporterLink.download = fileName;
+					exporterLink.click();
+					restoreEnvMap( );
+				},
+		(error) => { throw error },
+		{binary: binary}
+	);			
+}
+
+function exportPlatonAsJSON( )
+{
+	var fileName = 'platon.json';
+	
+	removeEnvMap( );
+
+	var type = 'text/plain;charset=utf-8',
+		data = JSON.stringify( primary.toJSON() ),
+		blob = new Blob( [data], {type: type} );
+	
+	exporterLink.href = URL.createObjectURL( blob );
+	exporterLink.download = fileName;
+	exporterLink.click();
+	
+	restoreEnvMap( );
+}
+
+
+export { MAX_LEVEL, updatePlatons, exportPlatonAsGLTF, exportPlatonAsJSON };

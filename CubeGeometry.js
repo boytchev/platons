@@ -4,6 +4,7 @@
 class CubeGeometry extends THREE.PolyhedronGeometry
 {
 	constructor( radius, level )
+	
 	{
 		var vertices = [
 				-1,-1,-1,    1,-1,-1,    1, 1,-1,    -1, 1,-1,

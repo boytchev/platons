@@ -63,7 +63,9 @@
 
 		<script type="module">
 
-			import { MAX_LEVEL, updatePlatons } from './platons.js';
+			import * as THREE from './libs/three.module.min.js';
+			import { MAX_LEVEL, updatePlatons, exportPlatonAsGLTF, exportPlatonAsJSON } from './platons.js';
+			
 			
 			var PLATON_TYPES = {
 					'<em>T</em>etrahedron': 0,
@@ -73,9 +75,20 @@
 					'<em>I</em>cosahedron': 4
 				}
 					
+			var EXPORT_TYPES = {
+					/*'JPG': 1,*/
+					/*'PNG': 2,*/
+					'GLB &nbsp;<right>binary</right>': 3,
+					'GLTF &nbsp;<right>text</right>': 4,
+					'JSON &nbsp;<right>text</right>': 5,
+					/*'JS': 4,*/
+				}
+					
 			var mainOptions = {
 					geometry: '',
 					material: '',
+					type: 3, /* JPG */
+					action: exportPlaton,
 				};
 			
 			var primaryOptions = {
@@ -103,6 +116,8 @@
 			var gui = new lil.GUI({title:'<big>Platon</big>',container:document.getElementById('primary')}),
 				geoController = gui.add( mainOptions, 'geometry' ).name( 'Code<right>geometry</right>' ).onChange( onChangeCode ),
 				matController = gui.add( mainOptions, 'material' ).name( '<right>material</right>' ).onChange( onChangeCode );
+				gui.add( mainOptions, 'type', EXPORT_TYPES ).name( '<right>format</right>' );
+				gui.add( mainOptions, 'action' ).name( 'Export' );
 
 			var guiTopology = gui.addFolder( '<big>Topology</big>' );
 				guiTopology.add( primaryOptions, 'type', PLATON_TYPES ).name( 'Primary<right>type</right>' ).onChange( onChange );
@@ -110,18 +125,17 @@
 				guiTopology.add( secondaryOptions, 'type', PLATON_TYPES ).name( 'Secondary<right>type</right>' ).onChange( onChange );
 				guiTopology.add( secondaryOptions, 'level' ).min( 1 ).max( MAX_LEVEL ).step( 1 ).name( '<right>level</right>' ).onChange( onChange );
 				guiTopology.add( secondaryOptions, 'scale' ).min( 1 ).max( 100 ).step( 1 ).name( '<right>scale</right>' ).onChange( onChange );
-				
-				
-			var guiDecor = gui.addFolder( '<big>Decoration</big>' );
+					
+			var guiDecor = gui.addFolder( '<big>Decoration</big>' ).close( );
 				guiDecor.addColor( primaryOptions, 'color' ).name( 'Primary<right>color</right>' ).onChange( onChange );
 				guiDecor.add( primaryOptions, 'gloss' ).min( -10 ).max( 10 ).step( 1 ).name( '<right>gloss</right>' ).onChange( onChange );
 				guiDecor.addColor( secondaryOptions, 'color' ).name( 'Secondary<right>color</right>' ).onChange( onChange );
 				guiDecor.add( secondaryOptions, 'gloss' ).min( -10 ).max( 10 ).step( 1 ).name( '<right>gloss</right>' ).onChange( onChange );
 
-
-			var guiEnvironment = gui.addFolder( '<big>Environment</big>' );
+			var guiEnvironment = gui.addFolder( '<big>Environment</big>' ).close( );
 				guiEnvironment.add( environmentOptions, 'background' ).min( -2 ).max( 2 ).step( 1 ).name( 'Background' ).onChange( onChange );
 				guiEnvironment.add( environmentOptions, 'light' ).min( -2 ).max( 2 ).step( 1 ).name( 'Light' ).onChange( onChange );
+
 
 
 			function onChange( event )
@@ -169,7 +183,17 @@
 			}
 			
 
-
+			function exportPlaton( )
+			{
+				switch( mainOptions.type )
+				{
+					case 3 : exportPlatonAsGLTF( true ); break;
+					case 4 : exportPlatonAsGLTF( false ); break;
+					case 5 : exportPlatonAsJSON( ); break;
+				}
+			}
+			
+			
 			function onChangeCode( event )
 			{
 			}
