@@ -64,7 +64,7 @@
 		<script type="module">
 
 			import * as THREE from './libs/three.module.min.js';
-			import { MAX_LEVEL, updatePlatons, exportPlatonAsGLTF, exportPlatonAsJSON } from './platons.js';
+			import { MAX_LEVEL, updatePlatons, exportPlatonAsGLTF, exportPlatonAsJSON, exportPlatonAsImage } from './platons.js';
 			
 			
 			var PLATON_TYPES = {
@@ -76,11 +76,20 @@
 				}
 					
 			var EXPORT_TYPES = {
-					/*'JPG': 1,*/
-					/*'PNG': 2,*/
+					'JPG &nbsp;<right>image</right>': 1,
+					'PNG &nbsp;<right>image</right>': 2,
 					'GLB &nbsp;<right>binary</right>': 3,
 					'GLTF &nbsp;<right>text</right>': 4,
 					'JSON &nbsp;<right>text</right>': 5,
+					/*'JS': 4,*/
+				}
+					
+			var EXPORT_NAMES = {
+					1: 'JPG',
+					2: 'PNG',
+					3: 'GLB',
+					4: 'GLTF',
+					5: 'JSON',
 					/*'JS': 4,*/
 				}
 					
@@ -116,8 +125,8 @@
 			var gui = new lil.GUI({title:'<big>Platon</big>',container:document.getElementById('primary')}),
 				geoController = gui.add( mainOptions, 'geometry' ).name( 'Code<right>geometry</right>' ).onChange( onChangeCode ),
 				matController = gui.add( mainOptions, 'material' ).name( '<right>material</right>' ).onChange( onChangeCode );
-				gui.add( mainOptions, 'type', EXPORT_TYPES ).name( '<right>format</right>' );
-				gui.add( mainOptions, 'action' ).name( 'Export' );
+				gui.add( mainOptions, 'type', EXPORT_TYPES ).name( '<right>format</right>' ).onChange( onChange );
+			var	expController = gui.add( mainOptions, 'action' ).name( 'Export' );
 
 			var guiTopology = gui.addFolder( '<big>Topology</big>' );
 				guiTopology.add( primaryOptions, 'type', PLATON_TYPES ).name( 'Primary<right>type</right>' ).onChange( onChange );
@@ -177,6 +186,8 @@
 				mainOptions.material = material;
 				
 				
+				expController.name( 'Export as ' + EXPORT_NAMES[mainOptions.type] );
+				
 				geoController.updateDisplay( );
 				matController.updateDisplay( );
 
@@ -187,6 +198,8 @@
 			{
 				switch( mainOptions.type )
 				{
+					case 1 : exportPlatonAsImage( 'jpg', 'image/jpeg' ); break;
+					case 2 : exportPlatonAsImage( 'png', 'image/png' ); break;
 					case 3 : exportPlatonAsGLTF( true ); break;
 					case 4 : exportPlatonAsGLTF( false ); break;
 					case 5 : exportPlatonAsJSON( ); break;

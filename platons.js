@@ -165,6 +165,18 @@ function restoreEnvMap( )
 }
 
 
+function removeBackground( )
+{
+	scene.background = new THREE.Color( 'white' );
+}
+		
+
+function restoreBackground( )
+{
+	scene.background = wall;
+}
+
+
 var exporter = new GLTFExporter();
 var exporterLink = document.createElement('a');
 
@@ -208,5 +220,62 @@ function exportPlatonAsJSON( )
 	restoreEnvMap( );
 }
 
+function exportPlatonAsImage( extension, mime )
+{
+	var fileName = 'platon.'+extension;
 
-export { MAX_LEVEL, updatePlatons, exportPlatonAsGLTF, exportPlatonAsJSON };
+	removeBackground( );
+	renderer.render( scene, camera );
+	
+	var w = renderer.domElement.width,
+		h = renderer.domElement.height;
+
+	var canvas = document.createElement( 'canvas' );
+		canvas.width = w;
+		canvas.height = h;
+
+	var context = canvas.getContext( '2d' );
+		context.drawImage( renderer.domElement, 0, 0 ); 
+
+	var data = context.getImageData( 0, 0, w, h ).data;
+	
+	var minX = w-1,
+		maxX = 0,
+		minY = h-1,
+		maxY = 0;
+	
+	for( var y=0; y<h; y++ )
+	for( var x=0; x<w; x++ )
+	{
+		var i = 4*(y*w+x);
+		
+		if( data[0] != data[i] || data[1] != data[i+1]  || data[2] != data[i+2] )
+		{
+			minX = Math.min( minX, x );
+			maxX = Math.max( maxX, x );
+			minY = Math.min( minY, y );
+			maxY = Math.max( maxY, y );
+		}
+	}
+	
+	minX -= 8;
+	minY -= 8;
+	maxX += 8;
+	maxY += 8;
+	
+	var canvas2 = document.createElement( 'canvas' );
+		canvas2.width = maxX-minX;
+		canvas2.height = maxY-minY;
+
+	var context2 = canvas2.getContext( '2d' );
+		context2.drawImage( canvas, minX, minY, maxX-minX, maxY-minY, 0, 0, maxX-minX, maxY-minY,  ); 
+
+	exporterLink.href = canvas2.toDataURL( mime, 1.0 );
+	exporterLink.download = fileName;
+	exporterLink.click();
+	
+	restoreBackground( );
+}
+
+
+export { MAX_LEVEL, updatePlatons, exportPlatonAsGLTF, exportPlatonAsJSON, exportPlatonAsImage };
