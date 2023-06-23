@@ -9,6 +9,13 @@
 
 		
 		<style>
+			.lil-gui {
+				--name-width: 6em;
+				--slider-knob-width: 0.5em;
+				--widget-padding: 0 0 0 0.5em;
+				--number-color: orange;
+			}
+			
 			.lil-gui.root {
 				border-bottom-right-radius: 2em;
 				margin: 0em;
@@ -16,6 +23,18 @@
 				left: 0;
 				top: 0;
 				position: fixed;
+			}
+			
+			.lil-gui input.top{
+				border-top-right-radius: 0.65em;
+			}
+			
+			.lil-gui input.bottom, .lil-gui button.bottom{
+				border-bottom-right-radius: 0.65em;
+			}
+			
+			.lil-gui .controller.option .widget div {
+				width: 9.15em;
 			}
 			
 			.lil-gui em {
@@ -44,7 +63,7 @@
 			
 			right {
 				color: gray;
-				font-size: 80%;
+				font-size: 100%;
 				float: right;
 			}
 			
@@ -64,7 +83,7 @@
 		<script type="module">
 
 			import * as THREE from './libs/three.module.min.js';
-			import { MAX_LEVEL, updatePlatons, exportPlatonAsGLTF, exportPlatonAsJSON, exportPlatonAsImage } from './platons.js';
+			import { MAX_LEVEL, updatePlatons, exportPlatonAsGLTF, exportPlatonAsJSON, exportPlatonAsImage, exportPlatonAsJS } from './platons.js';
 			
 			
 			var PLATON_TYPES = {
@@ -78,25 +97,27 @@
 			var EXPORT_TYPES = {
 					'JPG &nbsp;<right>image</right>': 1,
 					'PNG &nbsp;<right>image</right>': 2,
-					'GLB &nbsp;<right>binary</right>': 3,
-					'GLTF &nbsp;<right>text</right>': 4,
-					'JSON &nbsp;<right>text</right>': 5,
-					/*'JS': 4,*/
+					'GLB &nbsp;<right>mode</right>': 3,
+					'GLTF &nbsp;<right>model</right>': 4,
+					'JSON &nbsp;<right>format</right>': 5,
+					'HTML &nbsp;<right>page</right>': 6,
+					'JS &nbsp;<right>code</right>': 7,
 				}
 					
 			var EXPORT_NAMES = {
-					1: 'JPG',
-					2: 'PNG',
-					3: 'GLB',
-					4: 'GLTF',
-					5: 'JSON',
-					/*'JS': 4,*/
+					1: 'JPG image',
+					2: 'PNG image',
+					3: 'GLB model',
+					4: 'GLTF model',
+					5: 'JSON data',
+					6: 'HTML page',
+					7: 'JS code',
 				}
 					
 			var mainOptions = {
-					geometry: '',
-					material: '',
-					type: 3, /* JPG */
+//					geometry: '',
+//					material: '',
+					type: 1, /* JPG */
 					action: exportPlaton,
 				};
 			
@@ -111,7 +132,17 @@
 					type: 1,
 					level: 2,
 					scale: 47,
+//					rotation: 0,
 					color: 0xffffff,
+					gloss: 0,
+				};
+			
+			var tertiaryOptions = {
+					type: 1,
+					level: 3,
+					scale: 36,
+//					rotation: 0,
+					color: 0xff003f,
 					gloss: 0,
 				};
 
@@ -122,43 +153,74 @@
 				
 			// interactive panel for selecting fluid effects
 	
-			var gui = new lil.GUI({title:'<big>Platon</big>',container:document.getElementById('primary')}),
-				geoController = gui.add( mainOptions, 'geometry' ).name( 'Code<right>geometry</right>' ).onChange( onChangeCode ),
-				matController = gui.add( mainOptions, 'material' ).name( '<right>material</right>' ).onChange( onChangeCode );
-				gui.add( mainOptions, 'type', EXPORT_TYPES ).name( '<right>format</right>' ).onChange( onChange );
-			var	expController = gui.add( mainOptions, 'action' ).name( 'Export' );
+			var gui = new lil.GUI({title:'<big>Platon</big>',container:document.getElementById('primary')});
+				gui.add( primaryOptions, 'type', PLATON_TYPES ).name( '<right>type</right>' ).onChange( onChange );
+				var a = gui.add( primaryOptions, 'level' ).min( 1 ).max( MAX_LEVEL ).step( 1 ).name( '<right>level</right>' ).onChange( onChange );
+				gui.addColor( primaryOptions, 'color' ).name( '<right>color</right>' ).onChange( onChange );
+				var b = gui.add( primaryOptions, 'gloss' ).min( -10 ).max( 10 ).step( 1 ).name( '<right>gloss</right>' ).onChange( onChange );
 
-			var guiTopology = gui.addFolder( '<big>Topology</big>' );
-				guiTopology.add( primaryOptions, 'type', PLATON_TYPES ).name( 'Primary<right>type</right>' ).onChange( onChange );
-				guiTopology.add( primaryOptions, 'level' ).min( 1 ).max( MAX_LEVEL ).step( 1 ).name( '<right>level</right>' ).onChange( onChange );
-				guiTopology.add( secondaryOptions, 'type', PLATON_TYPES ).name( 'Secondary<right>type</right>' ).onChange( onChange );
-				guiTopology.add( secondaryOptions, 'level' ).min( 1 ).max( MAX_LEVEL ).step( 1 ).name( '<right>level</right>' ).onChange( onChange );
-				guiTopology.add( secondaryOptions, 'scale' ).min( 1 ).max( 100 ).step( 1 ).name( '<right>scale</right>' ).onChange( onChange );
+a.$input.classList.add('top');
+b.$input.classList.add('bottom');
+
+
+			var guiSecond = gui.addFolder( '<big>Second platon</big>' );
+				guiSecond.add( secondaryOptions, 'type', PLATON_TYPES ).name( '<right>type</right>' ).onChange( onChange );
+				a = guiSecond.add( secondaryOptions, 'level' ).min( 1 ).max( MAX_LEVEL ).step( 1 ).name( '<right>level</right>' ).onChange( onChange );
+				guiSecond.add( secondaryOptions, 'scale' ).min( 1 ).max( 100 ).step( 1 ).name( '<right>scale</right>' ).onChange( onChange );
+				guiSecond.addColor( secondaryOptions, 'color' ).name( '<right>color</right>' ).onChange( onChange );
+				b = guiSecond.add( secondaryOptions, 'gloss' ).min( -10 ).max( 10 ).step( 1 ).name( '<right>gloss</right>' ).onChange( onChange );
+guiSecond.domElement.style.marginTop = '2em';
+a.$input.classList.add('top');				
+b.$input.classList.add('bottom');
+
+			var guiThird = gui.addFolder( '<big>Third platon</big>' );
+				guiThird.add( tertiaryOptions, 'type', PLATON_TYPES ).name( '<right>Type</right>' ).onChange( onChange );
+				a = guiThird.add( tertiaryOptions, 'level' ).min( 1 ).max( MAX_LEVEL ).step( 1 ).name( '<right>Level</right>' ).onChange( onChange );
+				guiThird.add( tertiaryOptions, 'scale' ).min( 1 ).max( 100 ).step( 1 ).name( '<right>Scale</right>' ).onChange( onChange );
+				guiThird.addColor( tertiaryOptions, 'color' ).name( '<right>color</right>' ).onChange( onChange );
+				b = guiThird.add( tertiaryOptions, 'gloss' ).min( -10 ).max( 10 ).step( 1 ).name( '<right>Gloss</right>' ).onChange( onChange );
+guiThird.domElement.style.marginTop = '2em';
+a.$input.classList.add('top');				
+b.$input.classList.add('bottom');
+
+//				gui.add( secondaryOptions, 'rotation' ).min( -12 ).max( 12 ).step( 1 ).name( '<right>rotation</right>' ).onChange( onChange );
+
+//			var guiDecor = gui.addFolder( '<big>Decoration</big>' );
+//				guiDecor.addColor( primaryOptions, 'color' ).name( '<right>Primary</right>' ).onChange( onChange );
+//				guiDecor.add( primaryOptions, 'gloss' ).min( -10 ).max( 10 ).step( 1 ).name( '<right>Gloss</right>' ).onChange( onChange );
+//				guiDecor.addColor( secondaryOptions, 'color' ).name( '<right>Add 1</right>' ).onChange( onChange );
+//				guiDecor.add( secondaryOptions, 'gloss' ).min( -10 ).max( 10 ).step( 1 ).name( '<right>Gloss</right>' ).onChange( onChange );
+//				guiDecor.addColor( tertiaryOptions, 'color' ).name( '<right>Add 2</right>' ).onChange( onChange );
+//				guiDecor.add( tertiaryOptions, 'gloss' ).min( -10 ).max( 10 ).step( 1 ).name( '<right>Gloss</right>' ).onChange( onChange );
+
+//			var guiEnvironment = gui.addFolder( '<big>Environment</big>' ).close( );
+//				guiEnvironment.add( environmentOptions, 'background' ).min( -2 ).max( 2 ).step( 1 ).name( 'Background' ).onChange( onChange );
+//				guiEnvironment.add( environmentOptions, 'light' ).min( -2 ).max( 2 ).step( 1 ).name( 'Light' ).onChange( onChange );
+
+			var guiExport = gui.addFolder( '<big>Export</big>' );
+				guiExport.add( mainOptions, 'type', EXPORT_TYPES ).name( '<right>format</right>' ).onChange( onChange );
+				//geoController = gui.add( mainOptions, 'geometry' ).name( 'Code<right>geometry</right>' ).onChange( onChangeCode ),
+				//matController = gui.add( mainOptions, 'material' ).name( '<right>material</right>' ).onChange( onChangeCode );
+			var	expController = guiExport.add( mainOptions, 'action' ).name( 'Export' );
+guiExport.domElement.style.marginTop = '2em';
+console.log(expController);
+expController.$button.classList.add('bottom');
+
 					
-			var guiDecor = gui.addFolder( '<big>Decoration</big>' ).close( );
-				guiDecor.addColor( primaryOptions, 'color' ).name( 'Primary<right>color</right>' ).onChange( onChange );
-				guiDecor.add( primaryOptions, 'gloss' ).min( -10 ).max( 10 ).step( 1 ).name( '<right>gloss</right>' ).onChange( onChange );
-				guiDecor.addColor( secondaryOptions, 'color' ).name( 'Secondary<right>color</right>' ).onChange( onChange );
-				guiDecor.add( secondaryOptions, 'gloss' ).min( -10 ).max( 10 ).step( 1 ).name( '<right>gloss</right>' ).onChange( onChange );
-
-			var guiEnvironment = gui.addFolder( '<big>Environment</big>' ).close( );
-				guiEnvironment.add( environmentOptions, 'background' ).min( -2 ).max( 2 ).step( 1 ).name( 'Background' ).onChange( onChange );
-				guiEnvironment.add( environmentOptions, 'light' ).min( -2 ).max( 2 ).step( 1 ).name( 'Light' ).onChange( onChange );
-
 
 
 			function onChange( event )
 			{
-				updatePlatons( primaryOptions, secondaryOptions, environmentOptions );
+				updatePlatons( primaryOptions, secondaryOptions, tertiaryOptions/*, environmentOptions*/ );
 				
-				
+				/*
 				// TOPOLOGY 
 				
 				// primary platon
 				var geometry = 'TOCDI'[primaryOptions.type];
 				if( primaryOptions.level != 1 )
 					geometry += primaryOptions.level;
-				geometry += ':';
+				geometry += '';
 				
 				// secondary platon
 				geometry += 'TOCDI'[secondaryOptions.type];
@@ -175,7 +237,7 @@
 					material += primaryOptions.gloss;
 				else if( primaryOptions.gloss > 0 )
 					material += '+' + primaryOptions.gloss;
-				material += ':';
+				material += ',';
 
 				material += secondaryOptions.color.toString(16);
 				if( secondaryOptions.gloss < 0 )
@@ -184,25 +246,33 @@
 					material += '+' + secondaryOptions.gloss;
 
 				mainOptions.material = material;
-				
+				*/
 				
 				expController.name( 'Export as ' + EXPORT_NAMES[mainOptions.type] );
 				
-				geoController.updateDisplay( );
-				matController.updateDisplay( );
+				//geoController.updateDisplay( );
+				//matController.updateDisplay( );
 
 			}
 			
 
 			function exportPlaton( )
 			{
+				var fileName = '';
+
+				fileName += 'TOCDI'[primaryOptions.type]+primaryOptions.level+'-';
+				fileName += 'TOCDI'[secondaryOptions.type]+secondaryOptions.level+secondaryOptions.scale+'-';
+				fileName += 'TOCDI'[tertiaryOptions.type]+tertiaryOptions.level+tertiaryOptions.scale;
+				
 				switch( mainOptions.type )
 				{
-					case 1 : exportPlatonAsImage( 'jpg', 'image/jpeg' ); break;
-					case 2 : exportPlatonAsImage( 'png', 'image/png' ); break;
-					case 3 : exportPlatonAsGLTF( true ); break;
-					case 4 : exportPlatonAsGLTF( false ); break;
-					case 5 : exportPlatonAsJSON( ); break;
+					case 1 : exportPlatonAsImage( fileName+'.jpg', 'image/jpeg' ); break;
+					case 2 : exportPlatonAsImage( fileName+'.png', 'image/png' ); break;
+					case 3 : exportPlatonAsGLTF( fileName+'.gltf', true ); break;
+					case 4 : exportPlatonAsGLTF( fileName+'.glb', false ); break;
+					case 5 : exportPlatonAsJSON( fileName+'.json' ); break;
+					case 6 : exportPlatonAsJS( fileName+'.html', true, primaryOptions,  secondaryOptions ); break;
+					case 7 : exportPlatonAsJS( fileName+'.js', false, primaryOptions,  secondaryOptions ); break;
 				}
 			}
 			
@@ -211,7 +281,7 @@
 			{
 			}
 			
-			updatePlatons( primaryOptions, secondaryOptions, environmentOptions );
+			updatePlatons( primaryOptions, secondaryOptions, tertiaryOptions/*environmentOptions*/ );
 			onChange( );
 		</script>
 	</body>

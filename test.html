@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+
+<html>
+
+<head>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+</head>
+	
+<body>
+	<script async
+		src="https://ga.jspm.io/npm:es-module-shims@1.5.1/dist/es-module-shims.js"
+		crossorigin="anonymous">
+	</script>
+	
+	<script type="importmap">
+	  {
+		"imports": {
+		  "three": "https://unpkg.com/three@0.153.0/build/three.module.js",
+		  "three/addons/": "https://unpkg.com/three@0.153.0/examples/jsm/"
+		}
+	  }
+	</script>
+
+	<script type="module">
+		import * as THREE from "three";
+		import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+		var renderer = new THREE.WebGLRenderer( {antialias:true} );
+			renderer.setSize( innerWidth, innerHeight );
+			renderer.setAnimationLoop( animationLoop );
+			document.body.appendChild( renderer.domElement );
+			document.body.style.margin = 0;
+			document.body.style.overflow = 'hidden';
+
+		var scene = new THREE.Scene();
+
+		var camera = new THREE.PerspectiveCamera( 30, innerWidth/innerHeight );
+			camera.position.set( 0, 3, 7 );
+			camera.lookAt( scene.position );
+
+		window.addEventListener( "resize", (event) => {
+			camera.aspect = innerWidth/innerHeight;
+			camera.updateProjectionMatrix( );
+			renderer.setSize( innerWidth, innerHeight );
+		});
+
+		var controls = new OrbitControls( camera, renderer.domElement );
+			controls.enableDamping = true;
+			controls.autoRotate = true;
+
+		var light = new THREE.DirectionalLight( 'white' );
+			light.target = scene;
+			scene.add( light );
+
+
+		var geometry = new THREE.BufferGeometry();
+		var vertices = new Float32Array( [
+				-1.0, -1.0,  1.0,
+				 1.0, -1.0,  1.0,
+				 1.0,  1.0,  1.0,
+
+				 1.0,  1.0,  1.0,
+				-1.0,  1.0,  1.0,
+				-1.0, -1.0,  1.0
+			] );
+
+		geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+		var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+		var mesh = new THREE.Mesh( geometry, material );
+		scene.add( mesh );
+		
+		
+		function animationLoop( t )
+		{
+			controls.update( );
+			light.position.copy( camera.position );
+			renderer.render( scene, camera );
+		}
+		</script>
+</body>
+</html>

@@ -13,9 +13,9 @@ import { GLTFExporter } from './libs/GLTFExporter.js';
 		document.body.style.margin = 0;
 		document.body.style.overflow = 'hidden';
 
-	var wall = new THREE.TextureLoader().load( 'textures/wall.png' );
-		wall.wrapS = THREE.RepeatWrapping;
-		wall.wrapT = THREE.RepeatWrapping;
+//	var wall = new THREE.TextureLoader().load( 'textures/wall.png' );
+//		wall.wrapS = THREE.RepeatWrapping;
+//		wall.wrapT = THREE.RepeatWrapping;
 
 	var envMap = new THREE.CubeTextureLoader().load( [
 			'textures/envMap.jpg', 'textures/envMap.jpg',
@@ -24,14 +24,17 @@ import { GLTFExporter } from './libs/GLTFExporter.js';
 		] );
 
 	var scene = new THREE.Scene();
-		scene.background = wall;	
+//		scene.background = wall;	
+		scene.background = new THREE.Color( 'white' );
 		scene.backgroundIntensity = 1;
 
-	var camera = new THREE.PerspectiveCamera( 60, 1, 10, 1000 );
+	var camera = new THREE.PerspectiveCamera( 60, 1, 20, 2000 );
 		camera.position.set( 0, 0, 250 );
 		camera.lookAt( scene.position );
 
 	var controls = new OrbitControls( camera, renderer.domElement );
+		controls.maxDistance = 1500;
+		controls.minDistance = 150;
 		controls.enableDamping = true;
 
 	var light = new THREE.DirectionalLight( 'white' );
@@ -50,7 +53,7 @@ import { GLTFExporter } from './libs/GLTFExporter.js';
 		camera.aspect = window.innerWidth / window.innerHeight;
 		camera.updateProjectionMatrix();
 
-		wall.repeat.set( window.innerWidth/100, window.innerHeight/100 );
+//		wall.repeat.set( window.innerWidth/100, window.innerHeight/100 );
 
 		renderer.setSize( window.innerWidth, window.innerHeight, true );
 	}			
@@ -88,6 +91,14 @@ import { GLTFExporter } from './libs/GLTFExporter.js';
 			THREE.IcosahedronGeometry,
 		]
 		
+	var SHAPE_CLASS_NAME = [
+			'THREE.TetrahedronGeometry',
+			'THREE.OctahedronGeometry',
+			'CubeGeometry',
+			'THREE.DodecahedronGeometry',
+			'THREE.IcosahedronGeometry',
+		]
+		
 	var SHAPE = [ [], [], [], [], [] ];
 	
 	for( var type=0; type<5; type++ )
@@ -111,6 +122,11 @@ import { GLTFExporter } from './libs/GLTFExporter.js';
 			envMap: envMap,
 		} )
 		
+	var tertiaryMaterial = new THREE.MeshStandardMaterial( {
+			flatShading: true,
+			envMap: envMap,
+		} )
+		
 	var primary = new THREE.Mesh( SHAPE[0][3], primaryMaterial );	
 		primary.scale.set( 70, 70, 70 );
 		scene.add( primary );
@@ -118,12 +134,16 @@ import { GLTFExporter } from './libs/GLTFExporter.js';
 	var secondary = new THREE.Mesh( SHAPE[1][2], secondaryMaterial );	
 		secondary.scale.set( 1, 1, 1 );
 		primary.add( secondary );
+
+	var tertiary = new THREE.Mesh( SHAPE[1][2], tertiaryMaterial );	
+		tertiary.scale.set( 1, 1, 1 );
+		primary.add( tertiary );
 }
 
 
 
 // update platons
-function updatePlatons( primaryOptions, secondaryOptions, environmentOptions )
+function updatePlatons( primaryOptions, secondaryOptions, tertiaryOptions/*, environmentOptions*/ )
 {
 	primary.geometry = SHAPE[primaryOptions.type][primaryOptions.level];
 	primary.material.color.set( primaryOptions.color );
@@ -134,19 +154,28 @@ function updatePlatons( primaryOptions, secondaryOptions, environmentOptions )
 	secondary.material.color.set( secondaryOptions.color );
 	secondary.material.metalness = THREE.MathUtils.mapLinear( secondaryOptions.gloss, -10, 10, 0, 1 );
 	secondary.material.roughness = 1-secondary.material.metalness;
+	
+	tertiary.geometry = SHAPE[tertiaryOptions.type][tertiaryOptions.level];
+	tertiary.material.color.set( tertiaryOptions.color );
+	tertiary.material.metalness = THREE.MathUtils.mapLinear( tertiaryOptions.gloss, -10, 10, 0, 1 );
+	tertiary.material.roughness = 1-tertiary.material.metalness;
 
 	var range = RANGE[ `${primaryOptions.type}-${primaryOptions.level}-${secondaryOptions.type}-${secondaryOptions.level}` ];
 	if( !range ) range = [1,2000];
 	
-	var scale = THREE.MathUtils.mapLinear( secondaryOptions.scale, 0, 100, range[0], range[1] ) / 1000;
-	secondary.scale.set( scale, scale, scale );
+	secondary.scale.setScalar( THREE.MathUtils.mapLinear( secondaryOptions.scale, 0, 100, range[0], range[1] ) / 1000 );
 
-	scene.backgroundIntensity = [0,0.25,1,1.2,2][environmentOptions.background+2];
+	range = RANGE[ `${primaryOptions.type}-${primaryOptions.level}-${tertiaryOptions.type}-${tertiaryOptions.level}` ];
+	if( !range ) range = [1,2000];
 	
-	light.intensity = [0.1,0.4,0.8,1.1,1.5][environmentOptions.light+2];
+	tertiary.scale.setScalar( THREE.MathUtils.mapLinear( tertiaryOptions.scale, 0, 100, range[0], range[1] ) / 1000 );
+	
+	/*scene.backgroundIntensity = [0,0.25,1,1.2,2][environmentOptions.background+2];*/
+	
+	/*light.intensity = [0.1,0.4,0.8,1.1,1.5][environmentOptions.light+2];
 	
 	primary.material.envMapIntensity = [0.2,0.4,0.6,0.8,1][environmentOptions.light+2];
-	secondary.material.envMapIntensity = primary.material.envMapIntensity;
+	secondary.material.envMapIntensity = primary.material.envMapIntensity;*/
 }
 	
 	
@@ -167,23 +196,21 @@ function restoreEnvMap( )
 
 function removeBackground( )
 {
-	scene.background = new THREE.Color( 'white' );
+//	scene.background = new THREE.Color( 'white' );
 }
 		
 
 function restoreBackground( )
 {
-	scene.background = wall;
+//	scene.background = wall;
 }
 
 
 var exporter = new GLTFExporter();
 var exporterLink = document.createElement('a');
 
-function exportPlatonAsGLTF( binary )
+function exportPlatonAsGLTF( fileName, binary )
 {
-	var fileName = binary ? 'platon.glb' : 'platon.gltf';
-	
 	removeEnvMap( );
 	
 	exporter.parse(
@@ -203,10 +230,8 @@ function exportPlatonAsGLTF( binary )
 	);			
 }
 
-function exportPlatonAsJSON( )
+function exportPlatonAsJSON( fileName )
 {
-	var fileName = 'platon.json';
-	
 	removeEnvMap( );
 
 	var type = 'text/plain;charset=utf-8',
@@ -220,10 +245,8 @@ function exportPlatonAsJSON( )
 	restoreEnvMap( );
 }
 
-function exportPlatonAsImage( extension, mime )
+function exportPlatonAsImage( fileName, mime )
 {
-	var fileName = 'platon.'+extension;
-
 	removeBackground( );
 	renderer.render( scene, camera );
 	
@@ -277,5 +300,149 @@ function exportPlatonAsImage( extension, mime )
 	restoreBackground( );
 }
 
+function exportPlatonAsJS( fileName, html, primaryOptions,  secondaryOptions )
+{
+	var positionData1 = primary.geometry.getAttribute('position').array,
+		positionData2 = secondary.geometry.getAttribute('position').array;
+				
+	var injected = ((primaryOptions.type!=2) && (secondaryOptions.type!=2)) ? '' :`
+		class CubeGeometry extends THREE.PolyhedronGeometry
+		{
+			constructor( radius, level )
+			
+			{
+				var vertices = [
+						-1,-1,-1,    1,-1,-1,    1, 1,-1,    -1, 1,-1,
+						-1,-1, 1,    1,-1, 1,    1, 1, 1,    -1, 1, 1,
+					];
 
-export { MAX_LEVEL, updatePlatons, exportPlatonAsGLTF, exportPlatonAsJSON, exportPlatonAsImage };
+				var faces = [
+						2,1,0,    0,3,2,
+						0,4,7,    7,3,0,
+						0,1,5,    5,4,0,
+						1,2,6,    6,5,1,
+						2,3,7,    7,6,2,
+						4,5,6,    6,7,4
+					];
+
+				super( vertices, faces, radius, level );
+			}
+		}
+	`;
+	
+	var data = '';
+	
+	if( html )
+		data += `<!DOCTYPE html>
+
+<html>
+
+<head>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+</head>
+	
+<body>
+	<script async
+		src="https://ga.jspm.io/npm:es-module-shims@1.5.1/dist/es-module-shims.js"
+		crossorigin="anonymous">
+	</script>
+	
+	<script type="importmap">
+	  {
+		"imports": {
+		  "three": "https://unpkg.com/three@0.153.0/build/three.module.js",
+		  "three/addons/": "https://unpkg.com/three@0.153.0/examples/jsm/"
+		}
+	  }
+	</script>
+
+	<script type="module">
+		import * as THREE from "three";
+		import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+		var renderer = new THREE.WebGLRenderer( {antialias:true} );
+			renderer.setSize( innerWidth, innerHeight );
+			renderer.setAnimationLoop( animationLoop );
+			document.body.appendChild( renderer.domElement );
+			document.body.style.margin = 0;
+			document.body.style.overflow = 'hidden';
+
+		var scene = new THREE.Scene();
+
+		var camera = new THREE.PerspectiveCamera( 30, innerWidth/innerHeight );
+			camera.position.set( 0, 3, 7 );
+			camera.lookAt( scene.position );
+
+		window.addEventListener( "resize", (event) => {
+			camera.aspect = innerWidth/innerHeight;
+			camera.updateProjectionMatrix( );
+			renderer.setSize( innerWidth, innerHeight );
+		});
+
+		var controls = new OrbitControls( camera, renderer.domElement );
+			controls.enableDamping = true;
+			controls.autoRotate = true;
+
+		var light = new THREE.DirectionalLight( 'white' );
+			light.target = scene;
+			scene.add( light );
+
+		function animationLoop( t )
+		{
+			controls.update( );
+			light.position.copy( camera.position );
+			renderer.render( scene, camera );
+		}
+		
+		
+		
+`;
+
+	data += 
+`		// Platon definition
+
+		${injected}
+		
+		var platon = new THREE.Mesh(
+				new ${SHAPE_CLASS_NAME[primaryOptions.type]}( 1, ${primaryOptions.level-1} ),
+				new THREE.MeshStandardMaterial( {
+						color: 0x${primary.material.color.getHexString()},
+						metalness: ${primary.material.metalness},
+						roughness: ${primary.material.roughness},
+						flatShading: true } )
+			);
+			
+		scene.add( platon );
+		
+		var subplaton = new THREE.Mesh(
+				new ${SHAPE_CLASS_NAME[secondaryOptions.type]}( 1, ${secondaryOptions.level-1} ),
+				new THREE.MeshStandardMaterial( {
+						color: 0x${secondary.material.color.getHexString()},
+						metalness: ${secondary.material.metalness},
+						roughness: ${secondary.material.roughness},
+						flatShading: true } )
+			 );
+			 subplaton.scale.setScalar( ${Math.round(1000*secondary.scale.x)/1000} );
+			
+		platon.add( subplaton );
+`;
+
+	if( html )
+		data +=`			
+		
+	</script>
+</body>
+</html>`;
+
+	var type = 'text/plain;charset=utf-8',
+		blob = new Blob( [data], {type: type} );
+	
+	exporterLink.href = URL.createObjectURL( blob );
+	exporterLink.download = fileName;
+	exporterLink.click();
+
+}
+
+
+
+export { MAX_LEVEL, updatePlatons, exportPlatonAsGLTF, exportPlatonAsJSON, exportPlatonAsImage, exportPlatonAsJS };
