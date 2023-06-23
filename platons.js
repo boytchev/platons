@@ -300,12 +300,12 @@ function exportPlatonAsImage( fileName, mime )
 	restoreBackground( );
 }
 
-function exportPlatonAsJS( fileName, html, primaryOptions,  secondaryOptions )
+function exportPlatonAsJS( fileName, html, primaryOptions,  secondaryOptions, tertiaryOptions )
 {
 	var positionData1 = primary.geometry.getAttribute('position').array,
 		positionData2 = secondary.geometry.getAttribute('position').array;
 				
-	var injected = ((primaryOptions.type!=2) && (secondaryOptions.type!=2)) ? '' :`
+	var injected = ((primaryOptions.type!=2) && (secondaryOptions.type!=2) && (tertiaryOptions.type!=2)) ? '' :`
 		class CubeGeometry extends THREE.PolyhedronGeometry
 		{
 			constructor( radius, level )
@@ -317,12 +317,9 @@ function exportPlatonAsJS( fileName, html, primaryOptions,  secondaryOptions )
 					];
 
 				var faces = [
-						2,1,0,    0,3,2,
-						0,4,7,    7,3,0,
-						0,1,5,    5,4,0,
-						1,2,6,    6,5,1,
-						2,3,7,    7,6,2,
-						4,5,6,    6,7,4
+						2,1,0,    0,3,2,	0,4,7,    7,3,0,
+						0,1,5,    5,4,0,	1,2,6,    6,5,1,
+						2,3,7,    7,6,2,	4,5,6,    6,7,4
 					];
 
 				super( vertices, faces, radius, level );
@@ -414,7 +411,7 @@ function exportPlatonAsJS( fileName, html, primaryOptions,  secondaryOptions )
 			
 		scene.add( platon );
 		
-		var subplaton = new THREE.Mesh(
+		var subplaton1 = new THREE.Mesh(
 				new ${SHAPE_CLASS_NAME[secondaryOptions.type]}( 1, ${secondaryOptions.level-1} ),
 				new THREE.MeshStandardMaterial( {
 						color: 0x${secondary.material.color.getHexString()},
@@ -422,9 +419,19 @@ function exportPlatonAsJS( fileName, html, primaryOptions,  secondaryOptions )
 						roughness: ${secondary.material.roughness},
 						flatShading: true } )
 			 );
-			 subplaton.scale.setScalar( ${Math.round(1000*secondary.scale.x)/1000} );
+			 subplaton1.scale.setScalar( ${Math.round(1000*secondary.scale.x)/1000} );
 			
-		platon.add( subplaton );
+		var subplaton2 = new THREE.Mesh(
+				new ${SHAPE_CLASS_NAME[tertiaryOptions.type]}( 1, ${tertiaryOptions.level-1} ),
+				new THREE.MeshStandardMaterial( {
+						color: 0x${tertiary.material.color.getHexString()},
+						metalness: ${tertiary.material.metalness},
+						roughness: ${tertiary.material.roughness},
+						flatShading: true } )
+			 );
+			 subplaton2.scale.setScalar( ${Math.round(1000*tertiary.scale.x)/1000} );
+			
+		platon.add( subplaton1, subplaton2 );
 `;
 
 	if( html )

@@ -95,29 +95,27 @@
 				}
 					
 			var EXPORT_TYPES = {
-					'JPG &nbsp;<right>image</right>': 1,
+					//'JPG &nbsp;<right>image</right>': 1,
 					'PNG &nbsp;<right>image</right>': 2,
-					'GLB &nbsp;<right>mode</right>': 3,
-					'GLTF &nbsp;<right>model</right>': 4,
-					'JSON &nbsp;<right>format</right>': 5,
+					'GLB &nbsp;<right>model</right>': 3,
+					//'GLTF &nbsp;<right>model</right>': 4,
+					//'JSON &nbsp;<right>format</right>': 5,
 					'HTML &nbsp;<right>page</right>': 6,
-					'JS &nbsp;<right>code</right>': 7,
+					//'JS &nbsp;<right>code</right>': 7,
 				}
 					
 			var EXPORT_NAMES = {
-					1: 'JPG image',
-					2: 'PNG image',
-					3: 'GLB model',
-					4: 'GLTF model',
-					5: 'JSON data',
-					6: 'HTML page',
-					7: 'JS code',
+					//1: 'JPG image',
+					2: '<em>*.png</em> file',
+					3: '<em>*.glb</em> file',
+					//4: 'GLTF model',
+					//5: 'JSON data',
+					6: '<em>*.html</em> file',
+					//7: 'JS code',
 				}
 					
 			var mainOptions = {
-//					geometry: '',
-//					material: '',
-					type: 1, /* JPG */
+					type: 2, /* PNG */
 					action: exportPlaton,
 				};
 			
@@ -146,10 +144,10 @@
 					gloss: 0,
 				};
 
-			var environmentOptions = {
-					background: 0,
-					light: 0,
-				};
+//			var environmentOptions = {
+//					background: 0,
+//					light: 0,
+//				};
 				
 			// interactive panel for selecting fluid effects
 	
@@ -203,7 +201,6 @@ b.$input.classList.add('bottom');
 				//matController = gui.add( mainOptions, 'material' ).name( '<right>material</right>' ).onChange( onChangeCode );
 			var	expController = guiExport.add( mainOptions, 'action' ).name( 'Export' );
 guiExport.domElement.style.marginTop = '2em';
-console.log(expController);
 expController.$button.classList.add('bottom');
 
 					
@@ -266,13 +263,13 @@ expController.$button.classList.add('bottom');
 				
 				switch( mainOptions.type )
 				{
-					case 1 : exportPlatonAsImage( fileName+'.jpg', 'image/jpeg' ); break;
+					//case 1 : exportPlatonAsImage( fileName+'.jpg', 'image/jpeg' ); break;
 					case 2 : exportPlatonAsImage( fileName+'.png', 'image/png' ); break;
-					case 3 : exportPlatonAsGLTF( fileName+'.gltf', true ); break;
-					case 4 : exportPlatonAsGLTF( fileName+'.glb', false ); break;
-					case 5 : exportPlatonAsJSON( fileName+'.json' ); break;
-					case 6 : exportPlatonAsJS( fileName+'.html', true, primaryOptions,  secondaryOptions ); break;
-					case 7 : exportPlatonAsJS( fileName+'.js', false, primaryOptions,  secondaryOptions ); break;
+					case 3 : exportPlatonAsGLTF( fileName+'.glb', true ); break;
+					//case 4 : exportPlatonAsGLTF( fileName+'.gltf', false ); break;
+					//case 5 : exportPlatonAsJSON( fileName+'.json' ); break;
+					case 6 : exportPlatonAsJS( fileName+'.html', true, primaryOptions,  secondaryOptions, tertiaryOptions ); break;
+					//case 7 : exportPlatonAsJS( fileName+'.js', false, primaryOptions,  secondaryOptions, tertiaryOptions ); break;
 				}
 			}
 			
