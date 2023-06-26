@@ -115,7 +115,7 @@
 			
 		// interactive panel for selecting fluid effects
 
-		var gui = new lil.GUI({title:'<big><em>Platon</em> Online Generator</big><br><small><a href="https://boytchev.github.io/platons/gallery/">GALLERY</a> &middot; <a href="https://github.com/boytchev/platons">GITHUB</a></small>',container:document.getElementById('primary')});
+		var gui = new lil.GUI({title:'<big><em>Platon</em> Online Generator</big><br><small><a href="../gallery/index.html">GALLERY</a> &middot; <a href="https://github.com/boytchev/platons">GITHUB</a></small>',container:document.getElementById('primary')});
 			gui.add( primaryOptions, 'type', PLATON_TYPES ).name( '<right>type</right>' ).onChange( onChange );
 			var a = gui.add( primaryOptions, 'level' ).min( 1 ).max( MAX_LEVEL ).step( 1 ).name( '<right>level</right>' ).onChange( onChange );
 			gui.addColor( primaryOptions, 'color' ).name( '<right>color</right>' ).onChange( onChange );
