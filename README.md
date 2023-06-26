@@ -5,9 +5,9 @@ They can be used as 3D avatars or in demo scenes instead of cubes and spheres.
 This repository contains an online tool to generate platons and save them as
 images, 3D models or web pages with Three.js code.
 
-### Launch [[Online PLATONS Generator](https://boytchev.github.io/platons/)]
+### Launch [[Online PLATONS Generator](https://boytchev.github.io/platons/online/)]
 
-[<img src="online/images/screenshot.png">](https://boytchev.github.io/platons/)
+[<img src="online/images/screenshot.png">](https://boytchev.github.io/platons/online/)
 
 ### Architecture
 
