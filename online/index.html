@@ -1,0 +1,315 @@
+﻿<!DOCTYPE html>
+
+
+<html>
+
+
+<head>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+	<link rel="shortcut icon" type="image/png" href="images/logo.png"/>
+	<link rel="stylesheet" href="styles.css">
+
+	<script async
+		src="https://ga.jspm.io/npm:es-module-shims@1.5.1/dist/es-module-shims.js"
+		crossorigin="anonymous">
+	</script>
+	
+	<script type="importmap">
+	  {
+		"imports": {
+		  "three": "https://unpkg.com/three@0.153.0/build/three.module.js",
+		  "three/addons/": "https://unpkg.com/three@0.153.0/examples/jsm/"
+		}
+	  }
+	</script>
+</head>
+
+
+<body>
+	<!--div id="hud-top">
+		<a href="https://github.com/boytchev/platons">
+			<h1>PLATON</h1>
+			<h2>Online Generator</h2>
+		</a>
+	</div-->
+	
+	<div id="hud-bottom">
+		<image src="images/mouse.svg">
+	</div>
+	
+	<input id="code" type="text" value="" style="z-index:-1;">
+	
+	
+	<script type="module">
+		import * as THREE from 'three';
+		import * as lil from 'three/addons/libs/lil-gui.module.min.js';
+		import { MAX_LEVEL, updatePlatons, exportPlatonAsGLTF, exportPlatonAsJSON, exportPlatonAsImage, exportPlatonAsHTML, exportPlatonAsJS } from './platons.js';
+		
+
+		var PLATON_TYPES = {
+				'<em>T</em>etrahedron': 0,
+				'<em>O</em>ctahedron': 1,
+				'<em>C</em>ube': 2,
+				'<em>D</em>odecahedron': 3,
+				'<em>I</em>cosahedron': 4
+			}
+				
+		var EXPORT_TYPES = {
+				//'JPG &nbsp;<right>image</right>': 1,
+				'Image': 2,
+				'3D Model': 3,
+				//'GLTF &nbsp;<right>model</right>': 4,
+				//'JSON &nbsp;<right>format</right>': 5,
+				'Web Page': 6,
+				'JS Module': 7,
+				'URL code': 8,
+			}
+				
+		var EXPORT_NAMES = {
+				//1: 'JPG image',
+				2: '<em>*.png</em> image file',
+				3: '<em>*.glb</em> model file',
+				//4: 'GLTF model',
+				//5: 'JSON data',
+				6: '<em>*.html</em> web page',
+				7: '<em>*.js</em> module',
+				8: '<em>URL</em> parameters',
+			}
+				
+		var mainOptions = {
+				//type: 2, /* PNG */
+				type: 6, /* PNG */
+				action: exportPlaton,
+			};
+		
+		var primaryOptions = {
+				type: 0,
+				level: 3,
+				color: 0x09135D,
+				gloss: 0,
+			};
+		
+		var secondaryOptions = {
+				type: 1,
+				level: 2,
+				scale: 47,
+//					rotation: 0,
+				color: 0xffffff,
+				gloss: 0,
+			};
+		
+		var tertiaryOptions = {
+				type: 1,
+				level: 3,
+				scale: 36,
+//					rotation: 0,
+				color: 0xff003f,
+				gloss: 0,
+			};
+
+//			var environmentOptions = {
+//					background: 0,
+//					light: 0,
+//				};
+			
+		// interactive panel for selecting fluid effects
+
+		var gui = new lil.GUI({title:'<big><em>Platon</em> Online Generator</big><br><small><a>GALLERY</a> &middot; <a href="https://github.com/boytchev/platons">GITHUB</a></small>',container:document.getElementById('primary')});
+			gui.add( primaryOptions, 'type', PLATON_TYPES ).name( '<right>type</right>' ).onChange( onChange );
+			var a = gui.add( primaryOptions, 'level' ).min( 1 ).max( MAX_LEVEL ).step( 1 ).name( '<right>level</right>' ).onChange( onChange );
+			gui.addColor( primaryOptions, 'color' ).name( '<right>color</right>' ).onChange( onChange );
+			var b = gui.add( primaryOptions, 'gloss' ).min( -3 ).max( 3 ).step( 1 ).name( '<right>gloss</right>' ).onChange( onChange );
+
+gui.$title.style.marginBottom = "2em";
+a.$input.classList.add('top');
+b.$input.classList.add('bottom');
+
+
+		var guiSecond = gui.addFolder( '<big>Second platon</big>' );
+			guiSecond.add( secondaryOptions, 'type', PLATON_TYPES ).name( '<right>type</right>' ).onChange( onChange );
+			a = guiSecond.add( secondaryOptions, 'level' ).min( 1 ).max( MAX_LEVEL ).step( 1 ).name( '<right>level</right>' ).onChange( onChange );
+			guiSecond.add( secondaryOptions, 'scale' ).min( 1 ).max( 100 ).step( 1 ).name( '<right>scale</right>' ).onChange( onChange );
+			guiSecond.addColor( secondaryOptions, 'color' ).name( '<right>color</right>' ).onChange( onChange );
+			b = guiSecond.add( secondaryOptions, 'gloss' ).min( -3 ).max( 3 ).step( 1 ).name( '<right>gloss</right>' ).onChange( onChange );
+guiSecond.domElement.style.marginTop = '2em';
+a.$input.classList.add('top');				
+b.$input.classList.add('bottom');
+
+		var guiThird = gui.addFolder( '<big>Third platon</big>' );
+			guiThird.add( tertiaryOptions, 'type', PLATON_TYPES ).name( '<right>type</right>' ).onChange( onChange );
+			a = guiThird.add( tertiaryOptions, 'level' ).min( 1 ).max( MAX_LEVEL ).step( 1 ).name( '<right>level</right>' ).onChange( onChange );
+			guiThird.add( tertiaryOptions, 'scale' ).min( 1 ).max( 100 ).step( 1 ).name( '<right>scale</right>' ).onChange( onChange );
+			guiThird.addColor( tertiaryOptions, 'color' ).name( '<right>color</right>' ).onChange( onChange );
+			b = guiThird.add( tertiaryOptions, 'gloss' ).min( -3 ).max( 3 ).step( 1 ).name( '<right>gloss</right>' ).onChange( onChange );
+guiThird.domElement.style.marginTop = '2em';
+a.$input.classList.add('top');				
+b.$input.classList.add('bottom');
+
+		var guiExport = gui.addFolder( '<big>Export</big>' );
+			guiExport.add( mainOptions, 'type', EXPORT_TYPES ).name( '<right>format</right>' ).onChange( onChange );
+			//geoController = gui.add( mainOptions, 'geometry' ).name( 'Code<right>geometry</right>' ).onChange( onChangeCode ),
+			//matController = gui.add( mainOptions, 'material' ).name( '<right>material</right>' ).onChange( onChangeCode );
+		var	expController = guiExport.add( mainOptions, 'action' ).name( 'Export' );
+guiExport.domElement.style.marginTop = '2em';
+expController.$button.classList.add('bottom');
+
+				
+
+		window.addEventListener( 'pointerdown', onPointerDown );
+		
+		function onPointerDown( event )
+		{
+			window.removeEventListener( 'pointerdown', onPointerDown );
+			document.getElementById( 'hud-bottom' ).style.display = 'none';
+		}
+		
+		function onChange( event )
+		{
+			updatePlatons( primaryOptions, secondaryOptions, tertiaryOptions/*, environmentOptions*/ );
+			expController.name( 'Export as ' + EXPORT_NAMES[mainOptions.type] );
+		}
+		
+
+		function exportPlaton( )
+		{
+			var fileName = '';
+
+			fileName += 'TOCDI'[primaryOptions.type]+primaryOptions.level+'-';
+			fileName += 'TOCDI'[secondaryOptions.type]+secondaryOptions.level+''+secondaryOptions.scale+'-';
+			fileName += 'TOCDI'[tertiaryOptions.type]+tertiaryOptions.level+''+tertiaryOptions.scale;
+			
+			var material = (primaryOptions.gloss+3)+primaryOptions.color.toString(16)+'-'+ 
+						   (secondaryOptions.gloss+3)+secondaryOptions.color.toString(16)+'-'+ 
+						   (tertiaryOptions.gloss+3)+tertiaryOptions.color.toString(16);
+			
+			switch( mainOptions.type )
+			{
+				//case 1 : exportPlatonAsImage( fileName+'.jpg', 'image/jpeg' ); break;
+				case 2 : exportPlatonAsImage( fileName+'.png', 'image/png' ); break;
+				case 3 : exportPlatonAsGLTF( fileName+'.glb', true ); break;
+				//case 4 : exportPlatonAsGLTF( fileName+'.gltf', false ); break;
+				//case 5 : exportPlatonAsJSON( fileName+'.json' ); break;
+				case 6 : exportPlatonAsHTML( fileName+'.html', primaryOptions,  secondaryOptions, tertiaryOptions ); break;
+				case 7 : exportPlatonAsJS( fileName+'.js', primaryOptions,  secondaryOptions, tertiaryOptions ); break;
+				case 8 : copyToClipboard( `?g=${fileName}&m=${material}` ); break;
+			}
+		}
+
+		
+		function copyToClipboard( url )
+		{
+			// https://www.w3schools.com/howto/howto_js_copy_clipboard.asp
+
+			var element = document.getElementById( 'code' );
+				element.focus( );
+				element.value = url;
+				element.select( );
+				element.setSelectionRange( 0, 50 );
+
+			navigator.clipboard.writeText( element.value );
+		  
+			setTimeout( ()=>alert( 'The clipboard now contains the URL parameters:\n\r' + element.value), 500 );
+		}
+
+
+		function generateFromURL( )
+		{
+			var urlParams = new URLSearchParams( window.location.search ),
+				geometries = urlParams.get('g'),
+				materials = urlParams.get('m');
+				
+				
+			// process geometries
+			if( geometries == null ) return;
+			
+			// 3 fragments
+			geometries = geometries.split( '-' );
+			if( geometries.length != 3 ) return;
+			
+			// fragment 1
+			var g1 = geometries[0],
+				t1 = 'TOCDI'.indexOf( g1[0] ),
+				l1 = parseInt( g1[1] );
+			
+			if( t1<0 ) return;
+			if( l1<1 ) return;
+			if( l1>MAX_LEVEL ) return;
+			
+			// fragment 2
+			var g2 = geometries[1],
+				t2 = 'TOCDI'.indexOf( g2[0] ),
+				l2 = parseInt( g2[1] ),
+				s2 = parseInt( g2.substring(2) );
+			
+			if( t2<0 ) return;
+			if( l2<1 ) return;
+			if( l2>MAX_LEVEL ) return;
+			if( s2<0 ) return;
+			if( s2>100 ) return;
+			
+			// fragment 3
+			var g3 = geometries[2],
+				t3 = 'TOCDI'.indexOf( g3[0] ),
+				l3 = parseInt( g3[1] ),
+				s3 = parseInt( g3.substring(2) );
+			
+			if( t3<0 ) return;
+			if( l3<1 ) return;
+			if( l3>MAX_LEVEL ) return;
+			if( s3<0 ) return;
+			if( s3>100 ) return;
+			
+			primaryOptions.type = t1;
+			primaryOptions.level = l1;
+
+			secondaryOptions.type = t2;
+			secondaryOptions.level = l2;
+			secondaryOptions.scale = s2;
+
+			tertiaryOptions.type = t3;
+			tertiaryOptions.level = l3;
+			tertiaryOptions.scale = s3;
+
+			// process materials
+			if( materials == null ) return;
+			
+			// 3 fragments
+			materials = materials.split( '-' );
+			if( materials.length != 3 ) return;
+			
+			// fragment 1
+			var m1 = materials[0],
+				o1 = parseInt(m1[0])-3,
+				c1 = parseInt(m1.substring(1),16);
+			
+			if( o1>=-3 && o1<=3 ) primaryOptions.gloss = o1;
+			if( c1>=0 && c1<=0xffffff ) primaryOptions.color = c1;
+			
+			// fragment 2
+			var m2 = materials[1],
+				o2 = parseInt(m2[0])-3,
+				c2 = parseInt(m2.substring(1),16);
+			
+			if( o2>=-3 && o2<=3 ) secondaryOptions.gloss = o2;
+			if( c2>=0 && c2<=0xffffff ) secondaryOptions.color = c2;
+			
+			// fragment 3
+			var m3 = materials[2],
+				o3 = parseInt(m3[0])-3,
+				c3 = parseInt(m3.substring(1),16);
+			
+			if( o3>=-3 && o3<=3 ) tertiaryOptions.gloss = o3;
+			if( c3>=0 && c3<=0xffffff ) tertiaryOptions.color = c3;
+
+			for( var controller of gui.controllersRecursive() )
+			{
+				controller.updateDisplay( );
+			}
+		}
+		
+		generateFromURL( );
+		onChange( );
+	</script>
+</body>
+</html>
