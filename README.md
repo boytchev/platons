@@ -5,7 +5,7 @@ They can be used as 3D avatars or in demo scenes instead of cubes and spheres.
 This repository contains an online tool to generate platons and save them as
 images, 3D models or web pages with Three.js code.
 
-### Launch [[Online PLATONS Generator](https://boytchev.github.io/platons/online/)]
+### Launch [[PLATON ONLINE GENERATOR](https://boytchev.github.io/platons/online/)]
 
 [<img src="online/images/screenshot.png">](https://boytchev.github.io/platons/online/)
 
@@ -22,21 +22,15 @@ A platon consists of three overlapping Platonic solids. Each solid is defined by
 * **`COLOR`** of the Platonic solid.
 * **`GLOSS`** factor of the Platonic surface.
 
-### Import
-
-**Platons** may generate preset platon, provided as query string.
-
-?g=C1-O233-I336&m=6ff0000-3ffff00-4ff
-
-
 ### Export
 
 A platon generated with the online tool can be exported in several formats:
 
-* as a **PNG image** containing a cropped snapshot of the platon as it appears on the screen.
-* as a **3D model** in GLB/GLTF format, compatible with many 3D authoring software tools.
-* as a **web page** in HTML format that can be directly opened by a browser.
-* as a **JS module** in JS file that can be imported in used program.
+* **PNG image** of a cropped snapshot of the platon as it appears on the screen
+* **3D model** in a GLB file, compatible with many 3D authoring software tools
+* **web page** as a standalone HTML file that can be directly opened by a browser
+* **JS module** with platon class that can be imported in a JavaScript program
+* **URL code** copied in the clipboard, describing platon's geometry and material
 
 ### License
 **Platons** operates within the scope of **GPL-3.0 license**.

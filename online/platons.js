@@ -44,7 +44,7 @@ import { RANGE } from './platon-ranges.js';
 		scene.backgroundIntensity = 1;
 
 	var camera = new THREE.PerspectiveCamera( 60, 1, 20, 2000 );
-		camera.position.set( 0, 0, 250 );
+		camera.position.set( 10, 10, 10 ).setLength( 250 );
 		camera.lookAt( scene.position );
 
 	var controls = new OrbitControls( camera, renderer.domElement );
@@ -54,6 +54,7 @@ import { RANGE } from './platon-ranges.js';
 		//controls.autoRotate = true;
 
 	var light = new THREE.DirectionalLight( 'white' );
+		light.offset = new THREE.Vector3( 0, 100, 0 );
 		light.target = scene;
 		scene.add( light );
 
@@ -86,7 +87,7 @@ import { RANGE } from './platon-ranges.js';
 	function animate( )
 	{
 		controls.update( );
-		light.position.copy( camera.position );
+		light.position.copy( camera.position ).add( light.offset );
 		renderer.render( scene, camera );
 	}
 

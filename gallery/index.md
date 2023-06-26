@@ -6,6 +6,6 @@ A gallery of some platons. Click on a platon to open it in the
 [<img src="T2-T459-T547.png" width="150">](../online/?g=T2-T459-T547&m=670003c-6ffffff-2ffae00)
 [<img src="T3-T432-T532.png" width="150">](../online/?g=T3-T432-T532&m=6801a-6ffffff-2ffae00)
 [<img src="O3-T219-T361.png" width="150">](../online/?g=O3-T219-T361&m=629ffbf-6ffffff-64d40)
-[<img src=".png" width="100">](../online/?)
-[<img src=".png" width="100">](../online/?)
+[<img src="C2-O224-O345.png" width="150">](../online/?g=C2-O224-O345&m=0ffea00-3d5f5d0-6b35f00)
+[<img src="C2-O438-O343.png" width="150">](../online/?g=C2-O438-O343&m=0ffea00-3ffffff-6297500)
 [<img src=".png" width="100">](../online/?) |
