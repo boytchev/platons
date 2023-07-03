@@ -51,7 +51,9 @@ import { RANGE } from './platon-ranges.js';
 		controls.maxDistance = 1500;
 		controls.minDistance = 150;
 		controls.enableDamping = true;
-		//controls.autoRotate = true;
+		
+		controls.autoRotate = true;
+		controls.autoRotateSpeed = 10;
 
 	var light = new THREE.DirectionalLight( 'white' );
 		light.offset = new THREE.Vector3( 0, 100, 0 );
