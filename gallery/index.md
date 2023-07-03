@@ -1,9 +1,9 @@
 # <span style="color:darkorange; text-shadow: 1.5px 0 0 darkorange;">PLATON</span> <span style="text-shadow: 1.5px 0 0 black;">ONLINE GALLERY</span>
 
 
+!
 
-
-<kbd style="margin:10px">T1-T225-T336<br>[<img src="T1-T225-T336.gif">](../online/index.html?g=T1-T225-T336&m=39135d-3e8de73-3ff003f)</kbd>
+[<kbd style="margin:10px">T1-T225-T336<br><img src="T1-T225-T336.gif"></kbd>](../online/index.html?g=T1-T225-T336&m=39135d-3e8de73-3ff003f) 
 <kbd style="margin:10px">T1-T362-T265<br>[<img src="T1-T362-T265.gif">](../online/?g=T1-T362-T265&m=39135d-3739ae8-3ffffff)</kbd>
 <kbd style="margin:10px">T2-T359-T447<br>[<img src="T2-T359-T447.gif">](../online/?g=T2-T359-T447&m=6130070-6ffffff-6ffae00)</kbd>
 <kbd style="margin:10px">T2-T366-T557<br>[<img src="T2-T366-T557.gif">](../online/?g=T2-T366-T557&m=63000f-6ffffff-6d5ff)</kbd>
