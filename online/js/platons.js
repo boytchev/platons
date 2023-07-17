@@ -1,10 +1,10 @@
 ﻿import * as THREE from 'three';
 
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { CubeGeometry } from './CubeGeometry.js';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 
-import { RANGE } from './platon-ranges.js';
+import { CubeGeometry } from 'platons/CubeGeometry.js';
+import { RANGE } from 'platons/platon-ranges.js';
 
 
 
@@ -15,52 +15,37 @@ import { RANGE } from './platon-ranges.js';
 		document.body.style.margin = 0;
 		document.body.style.overflow = 'hidden';
 
-//	var wall = new THREE.TextureLoader().load( 'textures/wall.png' );
-//		wall.wrapS = THREE.RepeatWrapping;
-//		wall.wrapT = THREE.RepeatWrapping;
+	var ENV_MAP = `
+				data:image/webp;base64,UklGRvQAAABXRUJQVlA4IOgAAACwBwCdASpAA
+				CAAPzmKuFcvKKSjrBVcyeAnCWkAANdzA1rLAldOvERUBuXCMxWu8PTFAEhc+
+				jSI084Gao/ed1/AFYd0190AAP7x7UV8jvooHvqAq7Zzp2izqEV1DjjUcckWz
+				YyXH0FbSK5VYbnpyRUHpCQjMs61fBmGxJQQFkU4n9ESEPSzjkWDYskyKkosB
+				hdDzYsQg9J0JhuZTul59yDyKxsICZO6VwPjau2LpVz47pqkoGbUvqJ+lfX0l
+				MGYEMPr88lTDud5SKQVjTUkqKLR/e38wqfmobmC+qBvm6lneQLBJD0qsAAA`;
 
-	// var envMap = new THREE.CubeTextureLoader().load( [
-			// 'images/envMap.jpg', 'images/envMap.jpg',
-			// 'images/envMap.jpg', 'images/envMap.jpg',
-			// 'images/envMap.jpg', 'images/envMap.jpg',
-		// ] );
-
-	// var envMap = new THREE.CubeTextureLoader().load( [
-			// 'images/envMap.jpg', 'images/envMap.jpg',
-			// 'images/envMap.jpg', 'images/envMap.jpg',
-			// 'images/envMap.jpg', 'images/envMap.jpg',
-		// ] );
-
-	var envMap = new THREE.TextureLoader().load( 'images/envMap.jpg' );
-
-	//var envMap = new THREE.TextureLoader().load('https://threejs.org/examples/textures/2294472375_24a3b8ef46_o.jpg');
-	envMap.mapping = THREE.EquirectangularReflectionMapping;
-	
-	
+	var envMap = new THREE.TextureLoader().load( ENV_MAP );
+		envMap.mapping = THREE.EquirectangularReflectionMapping;
 	
 	var scene = new THREE.Scene();
-//		scene.background = wall;	
 		scene.background = new THREE.Color( 'white' );
-		scene.backgroundIntensity = 1;
 
-	var camera = new THREE.PerspectiveCamera( 60, 1, 20, 2000 );
-		camera.position.set( 10, 10, 10 ).setLength( 250 );
+	var camera = new THREE.PerspectiveCamera( 60, 1, 1, 200 );
+		camera.position.set( 1, 1, 1 ).setLength( 4 );
 		camera.lookAt( scene.position );
 
 	var controls = new OrbitControls( camera, renderer.domElement );
-		controls.maxDistance = 1500;
-		controls.minDistance = 150;
+		controls.maxDistance = 20;
+		controls.minDistance = 2;
 		controls.enableDamping = true;
-		
-//		controls.autoRotate = true;
-//		controls.autoRotateSpeed = 10;
+		//controls.autoRotate = true;
+		controls.autoRotateSpeed = 5;
 
-	var light = new THREE.DirectionalLight( 'white' );
-		light.offset = new THREE.Vector3( 0, 100, 0 );
-		light.target = scene;
+	var light = new THREE.DirectionalLight( );
+		light.name = 'Light';
 		scene.add( light );
 
-
+	var lightOffset = new THREE.Vector3( 0, 0.5, 1 );
+	
 }
 
 
@@ -71,8 +56,6 @@ import { RANGE } from './platon-ranges.js';
 	{
 		camera.aspect = window.innerWidth / window.innerHeight;
 		camera.updateProjectionMatrix();
-
-//		wall.repeat.set( window.innerWidth/100, window.innerHeight/100 );
 
 		renderer.setSize( window.innerWidth, window.innerHeight, true );
 	}			
@@ -89,7 +72,8 @@ import { RANGE } from './platon-ranges.js';
 	function animate( )
 	{
 		controls.update( );
-		light.position.copy( camera.position ).add( light.offset );
+		light.position.copy( camera.position ).add( lightOffset );
+
 		renderer.render( scene, camera );
 	}
 
@@ -124,39 +108,45 @@ import { RANGE } from './platon-ranges.js';
 	for( var level=1; level<=MAX_LEVEL; level++ )
 	{
 		SHAPE[type][level] = new SHAPE_CLASS[type]( 1, level-1 );
+		SHAPE[type][level].computeVertexNormals( );
 	}
+
 }
 
 
 
 // primary platon
 {
-	var primaryMaterial = new THREE.MeshStandardMaterial( {
-			flatShading: true,
+	var platon = new THREE.Group( );
+		platon.name = 'Platon';
+		scene.add( platon );
+		
+	var primaryMaterial = new THREE.MeshPhysicalMaterial( {
 			envMap: envMap,
 		} );
 
-	var secondaryMaterial = new THREE.MeshStandardMaterial( {
-			flatShading: true,
+	var secondaryMaterial = new THREE.MeshPhysicalMaterial( {
 			envMap: envMap,
 		} )
 		
-	var tertiaryMaterial = new THREE.MeshStandardMaterial( {
-			flatShading: true,
+	var tertiaryMaterial = new THREE.MeshPhysicalMaterial( {
 			envMap: envMap,
 		} )
 		
 	var primary = new THREE.Mesh( SHAPE[0][3], primaryMaterial );	
-		primary.scale.set( 70, 70, 70 );
-		scene.add( primary );
+		primary.name = 'PrimaryMesh';
+		primary.scale.set( 1, 1, 1 );
+		platon.add( primary );
 
 	var secondary = new THREE.Mesh( SHAPE[1][2], secondaryMaterial );	
+		secondary.name = 'SecondaryMesh';
 		secondary.scale.set( 1, 1, 1 );
-		primary.add( secondary );
+		platon.add( secondary );
 
 	var tertiary = new THREE.Mesh( SHAPE[1][2], tertiaryMaterial );	
+		tertiary.name = 'TertiaryMesh';
 		tertiary.scale.set( 1, 1, 1 );
-		primary.add( tertiary );
+		platon.add( tertiary );
 }
 
 
@@ -166,19 +156,19 @@ function updatePlatons( primaryOptions, secondaryOptions, tertiaryOptions/*, env
 {
 	primary.geometry = SHAPE[primaryOptions.type][primaryOptions.level];
 	primary.material.color.set( primaryOptions.color );
-	primary.material.metalness = THREE.MathUtils.mapLinear( primaryOptions.gloss, -3, 3, 0, 1 );
+	primary.material.metalness = THREE.MathUtils.mapLinear( primaryOptions.gloss, -3, 3, 0, 0.95 );
 	primary.material.roughness = 1-primary.material.metalness;
 	primary.material.envMapIntensity = primary.material.metalness;
 	
 	secondary.geometry = SHAPE[secondaryOptions.type][secondaryOptions.level];
 	secondary.material.color.set( secondaryOptions.color );
-	secondary.material.metalness = THREE.MathUtils.mapLinear( secondaryOptions.gloss, -3, 3, 0, 1 );
+	secondary.material.metalness = THREE.MathUtils.mapLinear( secondaryOptions.gloss, -3, 3, 0, 0.95 );
 	secondary.material.roughness = 1-secondary.material.metalness;
 	secondary.material.envMapIntensity = secondary.material.metalness;
 	
 	tertiary.geometry = SHAPE[tertiaryOptions.type][tertiaryOptions.level];
 	tertiary.material.color.set( tertiaryOptions.color );
-	tertiary.material.metalness = THREE.MathUtils.mapLinear( tertiaryOptions.gloss, -3, 3, 0, 1 );
+	tertiary.material.metalness = THREE.MathUtils.mapLinear( tertiaryOptions.gloss, -3, 3, 0, 0.95 );
 	tertiary.material.roughness = 1-tertiary.material.metalness;
 	tertiary.material.envMapIntensity = tertiary.material.metalness;
 
@@ -195,17 +185,39 @@ function updatePlatons( primaryOptions, secondaryOptions, tertiaryOptions/*, env
 	
 	
 
-function removeEnvMap( )
+function removeEnvMap( material )
 {
-	primaryMaterial.envMap = undefined;
-	secondaryMaterial.envMap = undefined;
+	if( material )
+	{
+		material.envMap = undefined;
+		material.oldMetalness = material.metalness;
+		material.oldRoughness = material.roughness;
+		material.metalness = 0;
+		material.roughness = 1;
+	}
+	else
+	{
+		removeEnvMap( primaryMaterial );
+		removeEnvMap( secondaryMaterial );
+		removeEnvMap( tertiaryMaterial );
+	}
 }
 		
 
-function restoreEnvMap( )
+function restoreEnvMap( material )
 {
-	primaryMaterial.envMap = envMap;
-	secondaryMaterial.envMap = envMap;
+	if( material )
+	{
+		material.envMap = envMap;
+		material.metalness = material.oldMetalness;
+		material.roughness = material.oldRoughness;
+	}
+	else
+	{
+		restoreEnvMap( primaryMaterial );
+		restoreEnvMap( secondaryMaterial );
+		restoreEnvMap( tertiaryMaterial );
+	}
 }
 
 
@@ -229,7 +241,7 @@ function exportPlatonAsGLTF( fileName, binary )
 	removeEnvMap( );
 	
 	exporter.parse(
-		primary,
+		platon,
 		(gltf) => {
 					var type = binary ? 'application/octet-stream' : 'text/plain;charset=utf-8',
 						data = binary ? gltf : JSON.stringify( gltf ),
@@ -340,9 +352,20 @@ class CubeGeometry extends THREE.PolyhedronGeometry
 `;
 }
 
-function getPlatonAsClass( primaryOptions, secondaryOptions, tertiaryOptions )
+function entab( string, tabs )
 {
-	return `
+	var from = '\n';
+	var to = '\n';
+	
+	for( ; tabs; tabs-- ) to += '\t';
+	
+	return string.split(from).join(to);
+}
+
+
+function getPlatonAsClass( primaryOptions, secondaryOptions, tertiaryOptions, tabs )
+{
+	return entab(`
 // Platon class definition
 
 class Platon extends THREE.Mesh
@@ -354,9 +377,11 @@ class Platon extends THREE.Mesh
 			new ${SHAPE_CLASS_NAME[primaryOptions.type]}( 1, ${primaryOptions.level-1} ),
 			new THREE.MeshStandardMaterial( {
 				color: 0x${primary.material.color.getHexString()},
-				metalness: ${primary.material.metalness},
-				roughness: ${primary.material.roughness},
-				flatShading: true } )
+				metalness: ${primary.material.metalness.toFixed(2)},
+				roughness: ${primary.material.roughness.toFixed(2)},
+				envMap: envMap,
+				flatShading: true
+			} )
 		);
 
 		// first subshape
@@ -364,9 +389,11 @@ class Platon extends THREE.Mesh
 				new ${SHAPE_CLASS_NAME[secondaryOptions.type]}( 1, ${secondaryOptions.level-1} ),
 				new THREE.MeshStandardMaterial( {
 						color: 0x${secondary.material.color.getHexString()},
-						metalness: ${secondary.material.metalness},
-						roughness: ${secondary.material.roughness},
-						flatShading: true } )
+						metalness: ${secondary.material.metalness.toFixed(2)},
+						roughness: ${secondary.material.roughness.toFixed(2)},
+						envMap: envMap,
+						flatShading: true
+				} )
 			 );
 			platon1.scale.setScalar( ${Math.round(1000*secondary.scale.x)/1000} );
 	
@@ -375,16 +402,18 @@ class Platon extends THREE.Mesh
 				new ${SHAPE_CLASS_NAME[tertiaryOptions.type]}( 1, ${tertiaryOptions.level-1} ),
 				new THREE.MeshStandardMaterial( {
 						color: 0x${tertiary.material.color.getHexString()},
-						metalness: ${tertiary.material.metalness},
-						roughness: ${tertiary.material.roughness},
-						flatShading: true } )
+						metalness: ${tertiary.material.metalness.toFixed(2)},
+						roughness: ${tertiary.material.roughness.toFixed(2)},
+						envMap: envMap,
+						flatShading: true
+				} )
 			 );
 			platon2.scale.setScalar( ${Math.round(1000*tertiary.scale.x)/1000} );
 	
 		this.add( platon1, platon2 );
 	} // Platon.constructor
 } // Platon
-`;
+`,tabs);
 }
 
 
@@ -430,7 +459,7 @@ function exportPlatonAsHTML( fileName, primaryOptions,  secondaryOptions, tertia
 
 		var scene = new THREE.Scene();
 
-		var camera = new THREE.PerspectiveCamera( 30, innerWidth/innerHeight );
+		var camera = new THREE.PerspectiveCamera( 30, innerWidth/innerHeight, 1, 50 );
 			camera.position.set( 0, 3, 7 );
 			camera.lookAt( scene.position );
 
@@ -448,6 +477,10 @@ function exportPlatonAsHTML( fileName, primaryOptions,  secondaryOptions, tertia
 			light.target = scene;
 			scene.add( light );
 
+		var envMap = new THREE.TextureLoader().load( \`${ENV_MAP}\` );
+				
+			envMap.mapping = THREE.EquirectangularReflectionMapping;
+
 		function animationLoop( t )
 		{
 			controls.update( );
@@ -456,12 +489,9 @@ function exportPlatonAsHTML( fileName, primaryOptions,  secondaryOptions, tertia
 		}
 		
 		
-		
-		// Platon definition
-
 		${hasCube ? '' : getCubeAsClass()}
 		
-		${getPlatonAsClass(primaryOptions,  secondaryOptions, tertiaryOptions)}
+		${getPlatonAsClass( primaryOptions, secondaryOptions, tertiaryOptions, 2 )}
 		
 		scene.add( new Platon( ) );
 		
@@ -489,7 +519,7 @@ function exportPlatonAsJS( fileName, primaryOptions, secondaryOptions, tertiaryO
 
 ${hasCube ? '' : getCubeAsClass()}
 		
-${getPlatonAsClass(primaryOptions, secondaryOptions, tertiaryOptions)}
+${getPlatonAsClass(primaryOptions, secondaryOptions, tertiaryOptions, 0)}
 		
 export { Platon };
 `;

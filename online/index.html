@@ -18,8 +18,9 @@
 	<script type="importmap">
 	  {
 		"imports": {
-		  "three": "https://unpkg.com/three@0.153.0/build/three.module.js",
-		  "three/addons/": "https://unpkg.com/three@0.153.0/examples/jsm/"
+		  "platons/": "./js/",
+		  "three": "./js/three.module.min.js",
+		  "three/addons/": "./js/"
 		}
 	  }
 	</script>
@@ -38,13 +39,13 @@
 		<image src="images/mouse.svg">
 	</div>
 	
-	<input id="code" type="text" value="" style="z-index:-1;">
+	<input id="code" type="text" value="" style="z-index:-1; position:fixed;">
 	
 	
 	<script type="module">
 		import * as THREE from 'three';
 		import * as lil from 'three/addons/libs/lil-gui.module.min.js';
-		import { MAX_LEVEL, updatePlatons, exportPlatonAsGLTF, exportPlatonAsJSON, exportPlatonAsImage, exportPlatonAsHTML, exportPlatonAsJS } from './platons.js';
+		import { MAX_LEVEL, updatePlatons, exportPlatonAsGLTF, exportPlatonAsJSON, exportPlatonAsImage, exportPlatonAsHTML, exportPlatonAsJS } from 'platons/platons.js';
 		
 
 		var PLATON_TYPES = {
@@ -63,7 +64,7 @@
 				//'JSON &nbsp;<right>format</right>': 5,
 				'Web Page': 6,
 				'JS Module': 7,
-				'URL code': 8,
+				'URL Link': 8,
 			}
 				
 		var EXPORT_NAMES = {
@@ -74,11 +75,12 @@
 				//5: 'JSON data',
 				6: '<em>*.html</em> web page',
 				7: '<em>*.js</em> module',
-				8: '<em>URL</em> parameters',
+				8: '<em>URL</em> link',
 			}
 				
 		var mainOptions = {
 				type: 2, /* PNG */
+				//type: 3, /* GLB */
 				action: exportPlaton,
 			};
 		
@@ -191,7 +193,7 @@ expController.$button.classList.add('bottom');
 				//case 5 : exportPlatonAsJSON( fileName+'.json' ); break;
 				case 6 : exportPlatonAsHTML( fileName+'.html', primaryOptions,  secondaryOptions, tertiaryOptions ); break;
 				case 7 : exportPlatonAsJS( fileName+'.js', primaryOptions,  secondaryOptions, tertiaryOptions ); break;
-				case 8 : copyToClipboard( `?g=${fileName}&m=${material}` ); break;
+				case 8 : copyToClipboard( `${window.location.href.split('?')[0]}?g=${fileName}&m=${material}` ); break;
 			}
 		}
 
@@ -208,7 +210,7 @@ expController.$button.classList.add('bottom');
 
 			navigator.clipboard.writeText( element.value );
 		  
-			setTimeout( ()=>alert( 'The clipboard now contains the URL parameters:\n\r' + element.value), 500 );
+			setTimeout( ()=>alert( 'The clipboard now contains the URL link:\n\r' + element.value), 500 );
 		}
 
 

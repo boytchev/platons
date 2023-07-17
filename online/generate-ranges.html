@@ -14,13 +14,28 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	</head>
 	
+	<script async
+		src="https://ga.jspm.io/npm:es-module-shims@1.5.1/dist/es-module-shims.js"
+		crossorigin="anonymous">
+	</script>
+	
+	<script type="importmap">
+	  {
+		"imports": {
+		  "platons/": "./js/",
+		  "three": "https://unpkg.com/three@0.153.0/build/three.module.js",
+		  "three/addons/": "https://unpkg.com/three@0.153.0/examples/jsm/"
+		}
+	  }
+	</script>
+
 	<body>
 		<div id="gencode"></div>
 		
 		<script type="module">
-			import * as THREE from './libs/three.module.min.js';
-			import {ConvexGeometry} from './libs/ConvexGeometry.js';
-			import {CubeGeometry} from './CubeGeometry.js';
+			import * as THREE from 'three';
+			import {ConvexGeometry} from 'three/addons/geometries/ConvexGeometry.js';
+			import { CubeGeometry } from 'platons/CubeGeometry.js';
 			
 
 			var MAX_LEVEL = 5;

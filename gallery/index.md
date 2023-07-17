@@ -1,4 +1,4 @@
-# <span style="color:darkorange; text-shadow: 1.5px 0 0 darkorange;">PLATON</span> <span style="text-shadow: 1.5px 0 0 black;">ONLINE GALLERY</span>
+# <span style="font-weight:700; color:darkorange;">PLATON</span> <span style="font-weight:700;">ONLINE GALLERY 1</span>[<span style="font-size: 0.5em; font-weight:300; float:right; position:relative; top:1em;">PAGE 2 &rarr;</span>](page2.html)
 
 
 
@@ -20,14 +20,4 @@
 [<kbd style="margin:10px">T3-T412-C324<br><img src="T3-T412-C324.gif"></kbd>](../online/?g=T3-T412-C324&m=3ff0000-3162a5a-3ffffff)
 [<kbd style="margin:10px">T3-T429-C448<br><img src="T3-T429-C448.gif"></kbd>](../online/?g=T3-T429-C448&m=31eff-3ff1f1f-3ffffff)
 [<kbd style="margin:10px">T2-T512-D137<br><img src="T2-T512-D137.gif"></kbd>](../online/?g=T2-T512-D137&m=3295c00-3ff8800-3f5ffe0)
-<!--
-[<kbd style="margin:10px"><br><img src=".gif"></kbd>](../online/)
--->
 
-<!--
-
-[<img src="O3-T219-T361.png" width="150">](../online/?g=O3-T219-T361&m=629ffbf-6ffffff-64d40)
-[<img src="C2-O224-O345.png" width="150">](../online/?g=C2-O224-O345&m=0ffea00-3d5f5d0-6b35f00)
-[<img src="C2-O438-O343.png" width="150">](../online/?g=C2-O438-O343&m=0ffea00-3ffffff-6297500)
-[<img src=".png" width="100">](../online/?) |
--->

@@ -1,0 +1,22 @@
+# <span style="font-weight:700; color:darkorange;">PLATON</span> <span style="font-weight:700;">ONLINE GALLERY 2</span>[<span style="font-size: 0.5em; font-weight:300; float:right; position:relative; top:1em;">&larr; PAGE 1</span>](index.html)
+
+
+
+[<kbd style="margin:10px">O1-T246-O217<br><img src="O1-T246-O217.gif"></kbd>](../online/?g=O1-T246-O217&m=39135d-6ffffff-3ffae00)
+[<kbd style="margin:10px">O1-T334-O336<br><img src="O1-T334-O336.gif"></kbd>](../online/?g=O1-T334-O336&m=366ff7f-60-3ffffff)
+[<kbd style="margin:10px">O1-T341-O424<br><img src="O1-T341-O424.gif"></kbd>](../online/?g=O1-T341-O424&m=3b3c4e6-3260080-3ffffff)
+[<kbd style="margin:10px">O2-I128-O48<br><img src="O2-I128-O48.gif"></kbd>](../online/?g=O2-I128-O48&m=3ffffff-30-30)
+[<kbd style="margin:10px">O2-I182-C556<br><img src="O2-I182-C556.gif"></kbd>](../online/?g=O2-I182-C556&m=3ffffff-6940047-0ffffff)
+[<kbd style="margin:10px">O3-T382-I114<br><img src="O3-T382-I114.gif"></kbd>](../online/?g=O3-T382-I114&m=3ffffff-329400-30)
+[<kbd style="margin:10px">O5-T530-I355<br><img src="O5-T530-I355.gif"></kbd>](../online/?g=O5-T530-I355&m=3ffffff-45c003f-3ff42cd)
+[<kbd style="margin:10px">C1-D131-I120<br><img src="C1-D131-I120.gif"></kbd>](../online/?g=C1-D131-I120&m=3ffffff-4fcfcfc-30)
+[<kbd style="margin:10px">C1-D144-I532<br><img src="C1-D144-I532.gif"></kbd>](../online/?g=&m=3a48fd6-40-3ffffff)
+[<kbd style="margin:10px">C2-D534-I532<br><img src="C2-D534-I532.gif"></kbd>](../online/?g=C2-D534-I532&m=35d2f09-30-3ffffff)
+[<kbd style="margin:10px">C3-I575-I132<br><img src="C3-I575-I132.gif"></kbd>](../online/?g=C3-I575-I132&m=35d0909-3ffffff-3e16bcb)
+[<kbd style="margin:10px">D1-C377-O371<br><img src="D1-C377-O371.gif"></kbd>](../online/?g=D1-C377-O371&m=00-3fbff00-3ff0000)
+[<kbd style="margin:10px">D5-D258-I557<br><img src="D5-D258-I557.gif"></kbd>](../online/?g=D5-D258-I557&m=0b13e3e-3e8e99f-3251313)
+[<kbd style="margin:10px">D2-D323-D419<br><img src="D2-D323-D419.gif"></kbd>](../online/?g=D2-D323-D419&m=6ffdbf8-6b30071-6664ce6)
+[<kbd style="margin:10px">D5-D242-I157<br><img src="D5-D242-I157.gif"></kbd>](../online/?g=D5-D242-I157&m=03eb15b-3e8e99f-3251313)
+[<kbd style="margin:10px">I5-C573-T525<br><img src="I5-C573-T525.gif"></kbd>](../online/?g=I5-C573-T525&m=6a447b-3ffffff-6ffbb00)
+[<kbd style="margin:10px">I5-D320-T338<br><img src="I5-D320-T338.gif"></kbd>](../online/?g=I5-D320-T338&m=678cc61-3d9d9d9-3f0f0f)
+[<kbd style="margin:10px">I5-I133-I455<br><img src="I5-I133-I455.gif"></kbd>](../online/?g=I5-I133-I455&m=38bd9f4-3f06000-3150080)

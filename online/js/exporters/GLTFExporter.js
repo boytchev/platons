@@ -23,10 +23,8 @@ import {
 	SRGBColorSpace,
 	CompressedTexture,
 	Vector3
-} from './three.module.min.js';
-
-//import { decompress } from './../utils/TextureUtils.js';
-function decompress(){};
+} from 'three';
+import { decompress } from './../utils/TextureUtils.js';
 
 
 /**
